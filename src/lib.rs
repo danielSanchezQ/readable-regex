@@ -58,13 +58,3 @@ pub const BACK_6: &str = r"\6";
 pub const BACK_7: &str = r"\7";
 pub const BACK_8: &str = r"\8";
 pub const BACK_9: &str = r"\9";
-
-#[cfg(test)]
-mod test {
-    use macros::back_reference;
-
-    #[test]
-    fn foo() {
-        println!("{}", back_reference!(5));
-    }
-}
