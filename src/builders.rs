@@ -1,3 +1,4 @@
+use crate::ReadableRe;
 use std::fmt::{Display, Formatter};
 
 /// Returns a string in the regex syntax for a back reference, such as \1, \2, etc.
@@ -19,14 +20,25 @@ impl Display for BackReference {
 /// ## Example
 /// ```
 /// use readable_regex::builders::Scape;
-/// let scaped = Scape("!#$%&");
+/// use readable_regex::ReadableRe;
+/// let scaped = Scape::from_str("!#$%&");
 /// assert_eq!(scaped.to_string(), "!\\#\\$%\\&");
 /// ```
-pub struct Scape<'a>(pub &'a str);
+pub struct Scape<'a>(Box<ReadableRe<'a>>);
 
 impl Display for Scape<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", regex::escape(self.0))
+        write!(f, "{}", regex::escape(&self.0.to_string()))
+    }
+}
+
+impl<'a> Scape<'a> {
+    pub fn from_str(s: &'a str) -> Self {
+        Self(Box::new(ReadableRe::Raw(s)))
+    }
+
+    pub fn new(readable_regex: ReadableRe<'a>) -> Self {
+        Self(Box::new(readable_regex))
     }
 }
 
@@ -34,16 +46,32 @@ impl Display for Scape<'_> {
 /// ### Example
 /// ```
 /// use readable_regex::builders::Group;
-/// assert_eq!(Group(vec!["cat"]).to_string(), "(cat)");
-/// assert_eq!(Group(vec!["cat", "dog", "moose"]).to_string(), "(catdogmoose)");
-/// assert_eq!(Group(vec!["cat", &Group(vec!["dog"]).to_string(), &Group(vec!["moose"]).to_string()]).to_string(), "(cat(dog)(moose))");
+/// use readable_regex::ReadableRe::{Raw, String};
+/// assert_eq!(Group::new(vec![Raw("cat")]).to_string(), "(cat)");
+/// assert_eq!(Group::new(vec![Raw("cat"), Raw("dog"), Raw("moose")]).to_string(), "(catdogmoose)");
+/// assert_eq!(
+///     Group::new(
+///         vec![
+///             Raw("cat"),
+///             String(Group::new(vec![Raw("dog")]).to_string()),
+///             String(Group::new(vec![Raw("moose")]).to_string())
+///         ]
+///     ).to_string(),
+///     "(cat(dog)(moose))"
+/// );
 /// ```
-pub struct Group<'a>(pub Vec<&'a str>);
+pub struct Group<'a>(Box<Vec<ReadableRe<'a>>>);
+
+impl<'a> Group<'a> {
+    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
+        Self(Box::new(v.into()))
+    }
+}
 
 impl Display for Group<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "(")?;
-        for s in &self.0 {
+        for s in self.0.as_ref() {
             write!(f, "{}", s)?;
         }
         write!(f, ")")
