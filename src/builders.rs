@@ -1,6 +1,32 @@
 use crate::ReadableRe;
 use std::fmt::{Display, Formatter};
 
+/// Just a [`ReadableRe`] concatenation wrapper
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::Concat;
+/// use readable_regex::ReadableRe::Raw;
+/// assert_eq!(&Concat::from_iter([Raw("foo"), Raw("bar")]).to_string(), "foobar");
+/// ```
+pub struct Concat<'a>(Vec<ReadableRe<'a>>);
+
+impl<'a> FromIterator<ReadableRe<'a>> for Concat<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}
+
+impl<'a> Display for Concat<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for re in &self.0 {
+            write!(f, "{}", re)?;
+        }
+        Ok(())
+    }
+}
+
 /// Returns a string in the regex syntax for a back reference, such as \1, \2, etc.
 /// ## Example
 /// ```
@@ -60,20 +86,56 @@ impl<'a> Scape<'a> {
 ///     "(cat(dog)(moose))"
 /// );
 /// ```
-pub struct Group<'a>(Box<Vec<ReadableRe<'a>>>);
+pub struct Group<'a>(Concat<'a>);
 
 impl<'a> Group<'a> {
     pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
-        Self(Box::new(v.into()))
+        Self(Concat(v))
     }
 }
 
-impl Display for Group<'_> {
+impl<'a> FromIterator<ReadableRe<'a>> for Group<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(Concat::from_iter(iter))
+    }
+}
+
+impl<'a> Display for Group<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "(")?;
-        for s in self.0.as_ref() {
-            write!(f, "{}", s)?;
-        }
-        write!(f, ")")
+        write!(f, "({})", self.0)
+    }
+}
+
+/// Regex syntax for a positive lookahead assertion of the regex strings
+/// A lookahead matches text but does not consume it in the original parsed text.
+///
+/// ## Example
+///
+/// In the following example, 'kitty' is matched but only if 'cat' follows
+/// 'kitty'. Note that the match only includes 'kitty' and not 'kittycat'.
+///
+/// ```
+/// use readable_regex::builders::PositiveLookAhead;
+/// use readable_regex::ReadableRe::Raw;
+/// assert_eq!("kitty".to_string() + &PositiveLookAhead::from_iter([Raw("cat")]).to_string(), "kitty(?=cat)");
+///
+/// ```
+pub struct PositiveLookAhead<'a>(Concat<'a>);
+
+impl<'a> PositiveLookAhead<'a> {
+    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
+        Self(Concat(v))
+    }
+}
+
+impl<'a> FromIterator<ReadableRe<'a>> for PositiveLookAhead<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(Concat::from_iter(iter))
+    }
+}
+
+impl<'a> Display for PositiveLookAhead<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(?={})", self.0)
     }
 }

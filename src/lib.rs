@@ -71,6 +71,7 @@ pub enum ReadableRe<'a> {
 
     Raw(&'a str),
     String(String),
+    Concat(builders::Concat<'a>),
 
     BackReference(builders::BackReference),
     Scape(builders::Scape<'a>),
@@ -134,6 +135,7 @@ impl Display for ReadableRe<'_> {
             ReadableRe::Back9 => &constants::BACK_9 as &dyn Display,
             ReadableRe::Raw(raw) => raw as &dyn Display,
             ReadableRe::String(s) => s as &dyn Display,
+            ReadableRe::Concat(concat) => concat as &dyn Display,
             ReadableRe::BackReference(back_reference) => back_reference as &dyn Display,
             ReadableRe::Scape(scape) => scape as &dyn Display,
             ReadableRe::Group(group) => group as &dyn Display,
