@@ -153,3 +153,51 @@ impl<'a> Display for PositiveLookAhead<'a> {
         write!(f, "(?={})", self.0)
     }
 }
+
+#[cfg(feature = "re-fancy")]
+/// Regex syntax for a negative lookahead assertion of the regex strings
+/// A lookahead matches text but does not consume it in the original parsed text.
+///
+/// ## Example
+///
+/// In the following example, 'kitty' is matched but only if the 'cat'
+/// does not follow 'kitty'. Note that the match only includes 'kitty' and not 'kittycat'
+///
+/// ```
+/// use readable_regex::builders::{Concat, NegativeLookAhead};
+/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use std::fmt::Display;
+/// let query = Concat::from_iter([
+///     ReadableRe::Raw("kitty"),
+///     ReadableRe::NegativeLookAhead(NegativeLookAhead::from_iter([ReadableRe::Raw("cat")])),
+///  ]);
+/// assert_eq!(
+///     query.to_string(),
+///     "kitty(?!cat)"
+/// );
+///
+/// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kitty").unwrap());
+/// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
+/// ```
+pub struct NegativeLookAhead<'a>(Concat<'a>);
+
+#[cfg(feature = "re-fancy")]
+impl<'a> NegativeLookAhead<'a> {
+    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
+        Self(Concat(v))
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl<'a> FromIterator<ReadableRe<'a>> for NegativeLookAhead<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(Concat::from_iter(iter))
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl<'a> Display for NegativeLookAhead<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(?!{})", self.0)
+    }
+}
