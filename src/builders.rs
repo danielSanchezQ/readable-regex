@@ -296,3 +296,41 @@ impl<'a> Display for NegativeLookBehind<'a> {
         write!(f, "(?<!{})", self.0)
     }
 }
+
+/// Regex syntax for a named group of the regex strings in tuple_of_regex_strs.
+/// Named groups can be referred to by their name rather than their group number.
+///
+/// ## Examples
+///
+/// ```
+/// use readable_regex::builders::NamedGroup;
+/// use readable_regex::ReadableRe::Raw;
+/// use std::fmt::Display;
+/// assert_eq!(
+///     &NamedGroup::new("group_name", [Raw(r"pattern_to_look_for")]).to_string(),
+///     "(?P<group_name>pattern_to_look_for)"
+/// );
+/// assert_eq!(
+///     &NamedGroup::new("pobox", [Raw(r"PO BOX \d{3:5}")]).to_string(),
+///     "(?P<pobox>PO BOX \\d{3:5})"
+/// );
+/// ```
+pub struct NamedGroup<'a> {
+    name: &'a str,
+    regexes: Concat<'a>,
+}
+
+impl<'a> NamedGroup<'a> {
+    pub fn new(name: &'a str, iter: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self {
+            name,
+            regexes: Concat::from_iter(iter),
+        }
+    }
+}
+
+impl<'a> Display for NamedGroup<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(?P<{}>{})", self.name, self.regexes)
+    }
+}
