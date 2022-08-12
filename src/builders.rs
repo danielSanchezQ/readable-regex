@@ -12,6 +12,12 @@ use std::fmt::{Display, Formatter};
 /// ```
 pub struct Concat<'a>(Vec<ReadableRe<'a>>);
 
+impl<'a> Concat<'a> {
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
+    }
+}
+
 impl<'a> FromIterator<ReadableRe<'a>> for Concat<'a> {
     fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
         Self(iter.into_iter().collect())
@@ -91,8 +97,8 @@ impl<'a> Scape<'a> {
 pub struct Group<'a>(Concat<'a>);
 
 impl<'a> Group<'a> {
-    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
-        Self(Concat(v))
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
     }
 }
 
@@ -137,8 +143,8 @@ pub struct PositiveLookAhead<'a>(Concat<'a>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> PositiveLookAhead<'a> {
-    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
-        Self(Concat(v))
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
     }
 }
 
@@ -185,8 +191,8 @@ pub struct NegativeLookAhead<'a>(Concat<'a>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> NegativeLookAhead<'a> {
-    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
-        Self(Concat(v))
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
     }
 }
 
@@ -231,8 +237,8 @@ pub struct PositiveLookBehind<'a>(Concat<'a>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> PositiveLookBehind<'a> {
-    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
-        Self(Concat(v))
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
     }
 }
 
@@ -278,8 +284,8 @@ pub struct NegativeLookBehind<'a>(Concat<'a>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> NegativeLookBehind<'a> {
-    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
-        Self(Concat(v))
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
     }
 }
 
