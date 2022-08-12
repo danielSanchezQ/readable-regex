@@ -3,9 +3,18 @@ mod constants;
 
 use std::fmt::{Display, Formatter};
 
-trait ReadableRegex: Display {
-    fn compile(&self) -> Result<regex::Regex, regex::Error> {
-        regex::Regex::new(&format!("{self}"))
+use regex::Error;
+
+#[cfg(feature = "re")]
+use regex::Regex;
+
+#[cfg(all(feature = "re-fancy", not(feature = "re")))]
+use fancy_regex::Regex;
+
+#[cfg(any(feature = "re", feature = "re-fancy"))]
+pub trait ReadableRegex: Display {
+    fn compile(&self) -> Result<Regex, Error> {
+        Regex::new(&format!("{self}"))
     }
 }
 
@@ -73,9 +82,14 @@ pub enum ReadableRe<'a> {
     String(String),
     Concat(builders::Concat<'a>),
 
+    #[cfg(feature = "re-fancy")]
     BackReference(builders::BackReference),
+
     Scape(builders::Scape<'a>),
     Group(builders::Group<'a>),
+
+    #[cfg(feature = "re-fancy")]
+    PositiveLookAhead(builders::PositiveLookAhead<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -136,9 +150,14 @@ impl Display for ReadableRe<'_> {
             ReadableRe::Raw(raw) => raw as &dyn Display,
             ReadableRe::String(s) => s as &dyn Display,
             ReadableRe::Concat(concat) => concat as &dyn Display,
+            #[cfg(feature = "re-fancy")]
             ReadableRe::BackReference(back_reference) => back_reference as &dyn Display,
             ReadableRe::Scape(scape) => scape as &dyn Display,
             ReadableRe::Group(group) => group as &dyn Display,
+            #[cfg(feature = "re-fancy")]
+            ReadableRe::PositiveLookAhead(positive_look_ahead) => {
+                positive_look_ahead as &dyn Display
+            }
         };
         write!(f, "{}", to_write)
     }

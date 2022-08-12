@@ -106,6 +106,7 @@ impl<'a> Display for Group<'a> {
     }
 }
 
+#[cfg(feature = "re-fancy")]
 /// Regex syntax for a positive lookahead assertion of the regex strings
 /// A lookahead matches text but does not consume it in the original parsed text.
 ///
@@ -115,25 +116,38 @@ impl<'a> Display for Group<'a> {
 /// 'kitty'. Note that the match only includes 'kitty' and not 'kittycat'.
 ///
 /// ```
-/// use readable_regex::builders::PositiveLookAhead;
-/// use readable_regex::ReadableRe::Raw;
-/// assert_eq!("kitty".to_string() + &PositiveLookAhead::from_iter([Raw("cat")]).to_string(), "kitty(?=cat)");
+/// use readable_regex::builders::{Concat, PositiveLookAhead};
+/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use std::fmt::Display;
+/// let query = Concat::from_iter([
+///     ReadableRe::Raw("kitty"),
+///     ReadableRe::PositiveLookAhead(PositiveLookAhead::from_iter([ReadableRe::Raw("cat")])),
+///  ]);
+/// assert_eq!(
+///     query.to_string(),
+///     "kitty(?=cat)"
+/// );
 ///
+/// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kitty").unwrap());
+/// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// ```
 pub struct PositiveLookAhead<'a>(Concat<'a>);
 
+#[cfg(feature = "re-fancy")]
 impl<'a> PositiveLookAhead<'a> {
     pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
         Self(Concat(v))
     }
 }
 
+#[cfg(feature = "re-fancy")]
 impl<'a> FromIterator<ReadableRe<'a>> for PositiveLookAhead<'a> {
     fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
         Self(Concat::from_iter(iter))
     }
 }
 
+#[cfg(feature = "re-fancy")]
 impl<'a> Display for PositiveLookAhead<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "(?={})", self.0)
