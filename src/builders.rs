@@ -27,6 +27,7 @@ impl<'a> Display for Concat<'a> {
     }
 }
 
+#[cfg(feature = "re-fancy")]
 /// Returns a string in the regex syntax for a back reference, such as \1, \2, etc.
 /// ## Example
 /// ```
@@ -36,6 +37,7 @@ impl<'a> Display for Concat<'a> {
 /// ```
 pub struct BackReference(pub usize);
 
+#[cfg(feature = "re-fancy")]
 impl Display for BackReference {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, r"\{}", self.0)
