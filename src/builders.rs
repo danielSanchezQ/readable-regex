@@ -203,3 +203,96 @@ impl<'a> Display for NegativeLookAhead<'a> {
         write!(f, "(?!{})", self.0)
     }
 }
+
+#[cfg(feature = "re-fancy")]
+/// Regex syntax for a positive lookbehind assertion of the input regexes.
+/// A lookbehind matches text but does not consume it in the original parsed text
+/// ## Example
+///
+/// In the following example, 'cat' is matched but only if 'kitty' is before 'cat'.
+/// Note that the match only includes 'cat' and not 'kittycat'.
+///
+/// ```
+/// use readable_regex::builders::{Concat, PositiveLookBehind};
+/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use std::fmt::Display;
+/// let query = Concat::from_iter([
+///     ReadableRe::PositiveLookBehind(PositiveLookBehind::from_iter([ReadableRe::Raw("kitty")])),
+///     ReadableRe::Raw("cat")
+///  ]);
+/// assert_eq!(
+///     query.to_string(),
+///     "(?<=kitty)cat"
+/// );
+/// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
+/// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("cat").unwrap());
+/// ```
+pub struct PositiveLookBehind<'a>(Concat<'a>);
+
+#[cfg(feature = "re-fancy")]
+impl<'a> PositiveLookBehind<'a> {
+    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
+        Self(Concat(v))
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl<'a> FromIterator<ReadableRe<'a>> for PositiveLookBehind<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(Concat::from_iter(iter))
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl<'a> Display for PositiveLookBehind<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(?<={})", self.0)
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+/// Negative lookbehind assertion of the regex input.
+/// A lookbehind matches text but does not consume it in the original parsed text
+///
+/// ## Example
+///
+/// In the following example, 'cat' is matched but only if 'kitty' is not
+/// before 'cat'. Note that the match only includes 'cat' and not 'kittycat'.
+///
+/// ```
+/// use readable_regex::builders::{Concat, NegativeLookBehind};
+/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use std::fmt::Display;
+/// let query = Concat::from_iter([
+///     ReadableRe::NegativeLookBehind(NegativeLookBehind::from_iter([ReadableRe::Raw("kitty")])),
+///     ReadableRe::Raw("cat")
+///  ]);
+/// assert_eq!(
+///     query.to_string(),
+///     "(?<!kitty)cat"
+/// );
+/// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
+/// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("black cat").unwrap());
+/// ```
+pub struct NegativeLookBehind<'a>(Concat<'a>);
+
+#[cfg(feature = "re-fancy")]
+impl<'a> NegativeLookBehind<'a> {
+    pub fn new(v: Vec<ReadableRe<'a>>) -> Self {
+        Self(Concat(v))
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl<'a> FromIterator<ReadableRe<'a>> for NegativeLookBehind<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(Concat::from_iter(iter))
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl<'a> Display for NegativeLookBehind<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(?<!{})", self.0)
+    }
+}

@@ -92,6 +92,10 @@ pub enum ReadableRe<'a> {
     PositiveLookAhead(builders::PositiveLookAhead<'a>),
     #[cfg(feature = "re-fancy")]
     NegativeLookAhead(builders::NegativeLookAhead<'a>),
+    #[cfg(feature = "re-fancy")]
+    PositiveLookBehind(builders::PositiveLookBehind<'a>),
+    #[cfg(feature = "re-fancy")]
+    NegativeLookBehind(builders::NegativeLookBehind<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -163,6 +167,14 @@ impl Display for ReadableRe<'_> {
             #[cfg(feature = "re-fancy")]
             ReadableRe::NegativeLookAhead(negative_look_ahead) => {
                 negative_look_ahead as &dyn Display
+            }
+            #[cfg(feature = "re-fancy")]
+            ReadableRe::PositiveLookBehind(positive_look_behind) => {
+                positive_look_behind as &dyn Display
+            }
+            #[cfg(feature = "re-fancy")]
+            ReadableRe::NegativeLookBehind(negative_look_behind) => {
+                negative_look_behind as &dyn Display
             }
         };
         write!(f, "{}", to_write)
