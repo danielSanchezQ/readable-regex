@@ -380,3 +380,35 @@ impl<'a> Display for NonCaptureGroup<'a> {
         write!(f, "(?:{})", self.0)
     }
 }
+
+/// Regex syntax for an optional part of the pattern of the regex strings in tuple_of_regex_strs
+///
+/// ## Example
+/// ```
+/// use readable_regex::builders::Optional;
+/// use readable_regex::ReadableRe::{self, Raw};
+/// let query = ReadableRe::Optional(Optional::new([Raw("foo")]));
+/// assert_eq!(
+///     query.to_string(),
+///     "foo?"
+/// );
+/// ```
+pub struct Optional<'a>(Concat<'a>);
+
+impl<'a> Optional<'a> {
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
+    }
+}
+
+impl<'a> FromIterator<ReadableRe<'a>> for Optional<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(Concat::from_iter(iter))
+    }
+}
+
+impl<'a> Display for Optional<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}?", self.0)
+    }
+}

@@ -98,6 +98,7 @@ pub enum ReadableRe<'a> {
     NegativeLookBehind(builders::NegativeLookBehind<'a>),
     NamedGroup(builders::NamedGroup<'a>),
     NonCaptureGroup(builders::NonCaptureGroup<'a>),
+    Optional(builders::Optional<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -180,6 +181,7 @@ impl Display for ReadableRe<'_> {
             }
             ReadableRe::NamedGroup(named_group) => named_group as &dyn Display,
             ReadableRe::NonCaptureGroup(non_capture_group) => non_capture_group as &dyn Display,
+            ReadableRe::Optional(optional) => optional as &dyn Display,
         };
         write!(f, "{}", to_write)
     }
