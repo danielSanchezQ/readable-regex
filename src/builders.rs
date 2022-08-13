@@ -79,32 +79,24 @@ impl<'a> Scape<'a> {
 /// Regex syntax for a regex group surrounded by parentheses of the regex input str
 /// ### Example
 /// ```
-/// use readable_regex::builders::Group;
-/// use readable_regex::ReadableRe::{Raw, String};
-/// assert_eq!(Group::new(vec![Raw("cat")]).to_string(), "(cat)");
-/// assert_eq!(Group::new(vec![Raw("cat"), Raw("dog"), Raw("moose")]).to_string(), "(catdogmoose)");
+/// use readable_regex::builders::{Concat, Group};
+/// use readable_regex::ReadableRe::{self, Raw};
+/// assert_eq!(Group::new(Raw("cat")).to_string(), "(cat)");
+/// assert_eq!(Group::new(ReadableRe::Concat(Concat::new([Raw("cat"), Raw("dog"), Raw("moose")]))).to_string(), "(catdogmoose)");
 /// assert_eq!(
-///     Group::new(
-///         vec![
-///             Raw("cat"),
-///             String(Group::new(vec![Raw("dog")]).to_string()),
-///             String(Group::new(vec![Raw("moose")]).to_string())
-///         ]
-///     ).to_string(),
-///     "(cat(dog)(moose))"
+///     Group::new(ReadableRe::Concat(Concat::new([
+///         Raw("cat"),
+///         ReadableRe::Group(Group::new(Raw("dog"))),
+///         ReadableRe::Group(Group::new(Raw("moose"))),
+///     ]))).to_string(),
+///     "(cat(dog)(moose))",
 /// );
 /// ```
-pub struct Group<'a>(Concat<'a>);
+pub struct Group<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> Group<'a> {
-    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
-        Self::from_iter(v)
-    }
-}
-
-impl<'a> FromIterator<ReadableRe<'a>> for Group<'a> {
-    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
-        Self(Concat::from_iter(iter))
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
     }
 }
 
@@ -127,9 +119,9 @@ impl<'a> Display for Group<'a> {
 /// use readable_regex::builders::{Concat, PositiveLookAhead};
 /// use readable_regex::{ReadableRe, ReadableRegex};
 /// use std::fmt::Display;
-/// let query = Concat::from_iter([
+/// let query = Concat::new([
 ///     ReadableRe::Raw("kitty"),
-///     ReadableRe::PositiveLookAhead(PositiveLookAhead::from_iter([ReadableRe::Raw("cat")])),
+///     ReadableRe::PositiveLookAhead(PositiveLookAhead::new(ReadableRe::Raw("cat"))),
 ///  ]);
 /// assert_eq!(
 ///     query.to_string(),
@@ -139,19 +131,12 @@ impl<'a> Display for Group<'a> {
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kitty").unwrap());
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// ```
-pub struct PositiveLookAhead<'a>(Concat<'a>);
+pub struct PositiveLookAhead<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> PositiveLookAhead<'a> {
-    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
-        Self::from_iter(v)
-    }
-}
-
-#[cfg(feature = "re-fancy")]
-impl<'a> FromIterator<ReadableRe<'a>> for PositiveLookAhead<'a> {
-    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
-        Self(Concat::from_iter(iter))
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
     }
 }
 
@@ -175,9 +160,9 @@ impl<'a> Display for PositiveLookAhead<'a> {
 /// use readable_regex::builders::{Concat, NegativeLookAhead};
 /// use readable_regex::{ReadableRe, ReadableRegex};
 /// use std::fmt::Display;
-/// let query = Concat::from_iter([
+/// let query = Concat::new([
 ///     ReadableRe::Raw("kitty"),
-///     ReadableRe::NegativeLookAhead(NegativeLookAhead::from_iter([ReadableRe::Raw("cat")])),
+///     ReadableRe::NegativeLookAhead(NegativeLookAhead::new(ReadableRe::Raw("cat"))),
 ///  ]);
 /// assert_eq!(
 ///     query.to_string(),
@@ -187,19 +172,12 @@ impl<'a> Display for PositiveLookAhead<'a> {
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kitty").unwrap());
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// ```
-pub struct NegativeLookAhead<'a>(Concat<'a>);
+pub struct NegativeLookAhead<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> NegativeLookAhead<'a> {
-    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
-        Self::from_iter(v)
-    }
-}
-
-#[cfg(feature = "re-fancy")]
-impl<'a> FromIterator<ReadableRe<'a>> for NegativeLookAhead<'a> {
-    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
-        Self(Concat::from_iter(iter))
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
     }
 }
 
@@ -222,8 +200,8 @@ impl<'a> Display for NegativeLookAhead<'a> {
 /// use readable_regex::builders::{Concat, PositiveLookBehind};
 /// use readable_regex::{ReadableRe, ReadableRegex};
 /// use std::fmt::Display;
-/// let query = Concat::from_iter([
-///     ReadableRe::PositiveLookBehind(PositiveLookBehind::from_iter([ReadableRe::Raw("kitty")])),
+/// let query = Concat::new([
+///     ReadableRe::PositiveLookBehind(PositiveLookBehind::new(ReadableRe::Raw("kitty"))),
 ///     ReadableRe::Raw("cat")
 ///  ]);
 /// assert_eq!(
@@ -233,19 +211,12 @@ impl<'a> Display for NegativeLookAhead<'a> {
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("cat").unwrap());
 /// ```
-pub struct PositiveLookBehind<'a>(Concat<'a>);
+pub struct PositiveLookBehind<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> PositiveLookBehind<'a> {
-    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
-        Self::from_iter(v)
-    }
-}
-
-#[cfg(feature = "re-fancy")]
-impl<'a> FromIterator<ReadableRe<'a>> for PositiveLookBehind<'a> {
-    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
-        Self(Concat::from_iter(iter))
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
     }
 }
 
@@ -270,7 +241,7 @@ impl<'a> Display for PositiveLookBehind<'a> {
 /// use readable_regex::{ReadableRe, ReadableRegex};
 /// use std::fmt::Display;
 /// let query = Concat::from_iter([
-///     ReadableRe::NegativeLookBehind(NegativeLookBehind::from_iter([ReadableRe::Raw("kitty")])),
+///     ReadableRe::NegativeLookBehind(NegativeLookBehind::new(ReadableRe::Raw("kitty"))),
 ///     ReadableRe::Raw("cat")
 ///  ]);
 /// assert_eq!(
@@ -280,19 +251,12 @@ impl<'a> Display for PositiveLookBehind<'a> {
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("black cat").unwrap());
 /// ```
-pub struct NegativeLookBehind<'a>(Concat<'a>);
+pub struct NegativeLookBehind<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
 impl<'a> NegativeLookBehind<'a> {
-    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
-        Self::from_iter(v)
-    }
-}
-
-#[cfg(feature = "re-fancy")]
-impl<'a> FromIterator<ReadableRe<'a>> for NegativeLookBehind<'a> {
-    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
-        Self(Concat::from_iter(iter))
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
     }
 }
 
@@ -313,24 +277,24 @@ impl<'a> Display for NegativeLookBehind<'a> {
 /// use readable_regex::ReadableRe::Raw;
 /// use std::fmt::Display;
 /// assert_eq!(
-///     &NamedGroup::new("group_name", [Raw(r"pattern_to_look_for")]).to_string(),
+///     &NamedGroup::new("group_name", Raw(r"pattern_to_look_for")).to_string(),
 ///     "(?P<group_name>pattern_to_look_for)"
 /// );
 /// assert_eq!(
-///     &NamedGroup::new("pobox", [Raw(r"PO BOX \d{3:5}")]).to_string(),
+///     &NamedGroup::new("pobox", Raw(r"PO BOX \d{3:5}")).to_string(),
 ///     "(?P<pobox>PO BOX \\d{3:5})"
 /// );
 /// ```
 pub struct NamedGroup<'a> {
     name: &'a str,
-    regexes: Concat<'a>,
+    regexes: Box<ReadableRe<'a>>,
 }
 
 impl<'a> NamedGroup<'a> {
-    pub fn new(name: &'a str, iter: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+    pub fn new(name: &'a str, re: ReadableRe<'a>) -> Self {
         Self {
             name,
-            regexes: Concat::from_iter(iter),
+            regexes: Box::new(re),
         }
     }
 }
@@ -354,24 +318,18 @@ impl<'a> Display for NamedGroup<'a> {
 /// use readable_regex::{ReadableRe, ReadableRegex};
 /// use std::fmt::Display;
 /// let query = ReadableRe::NonCaptureGroup(
-///     NonCaptureGroup::from_iter([ReadableRe::Raw("pattern_to_look_for")])
+///     NonCaptureGroup::new(ReadableRe::Raw("pattern_to_look_for"))
 /// );
 /// assert_eq!(
 ///     query.to_string(),
 ///     "(?:pattern_to_look_for)"
 /// );
 /// ```
-pub struct NonCaptureGroup<'a>(Concat<'a>);
+pub struct NonCaptureGroup<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> NonCaptureGroup<'a> {
-    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
-        Self::from_iter(v)
-    }
-}
-
-impl<'a> FromIterator<ReadableRe<'a>> for NonCaptureGroup<'a> {
-    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
-        Self(Concat::from_iter(iter))
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
     }
 }
 
@@ -387,23 +345,17 @@ impl<'a> Display for NonCaptureGroup<'a> {
 /// ```
 /// use readable_regex::builders::Optional;
 /// use readable_regex::ReadableRe::{self, Raw};
-/// let query = ReadableRe::Optional(Optional::new([Raw("foo")]));
+/// let query = ReadableRe::Optional(Optional::new(Raw("foo")));
 /// assert_eq!(
 ///     query.to_string(),
 ///     "foo?"
 /// );
 /// ```
-pub struct Optional<'a>(Concat<'a>);
+pub struct Optional<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> Optional<'a> {
-    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
-        Self::from_iter(v)
-    }
-}
-
-impl<'a> FromIterator<ReadableRe<'a>> for Optional<'a> {
-    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
-        Self(Concat::from_iter(iter))
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
     }
 }
 
