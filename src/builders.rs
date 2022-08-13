@@ -340,3 +340,43 @@ impl<'a> Display for NamedGroup<'a> {
         write!(f, "(?P<{}>{})", self.name, self.regexes)
     }
 }
+
+/// Regex syntax for a non-capturing group of the regex input
+///
+/// Non-capturing groups are not included in the groups field of a Pattern object.
+/// They are useful for when you want to group parts of a regex string together without
+/// affecting the numbered groups.
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::{Concat, NonCaptureGroup};
+/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use std::fmt::Display;
+/// let query = ReadableRe::NonCaptureGroup(
+///     NonCaptureGroup::from_iter([ReadableRe::Raw("pattern_to_look_for")])
+/// );
+/// assert_eq!(
+///     query.to_string(),
+///     "(?:pattern_to_look_for)"
+/// );
+/// ```
+pub struct NonCaptureGroup<'a>(Concat<'a>);
+
+impl<'a> NonCaptureGroup<'a> {
+    pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(v)
+    }
+}
+
+impl<'a> FromIterator<ReadableRe<'a>> for NonCaptureGroup<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        Self(Concat::from_iter(iter))
+    }
+}
+
+impl<'a> Display for NonCaptureGroup<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(?:{})", self.0)
+    }
+}

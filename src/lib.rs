@@ -97,6 +97,7 @@ pub enum ReadableRe<'a> {
     #[cfg(feature = "re-fancy")]
     NegativeLookBehind(builders::NegativeLookBehind<'a>),
     NamedGroup(builders::NamedGroup<'a>),
+    NonCaptureGroup(builders::NonCaptureGroup<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -178,6 +179,7 @@ impl Display for ReadableRe<'_> {
                 negative_look_behind as &dyn Display
             }
             ReadableRe::NamedGroup(named_group) => named_group as &dyn Display,
+            ReadableRe::NonCaptureGroup(non_capture_group) => non_capture_group as &dyn Display,
         };
         write!(f, "{}", to_write)
     }
