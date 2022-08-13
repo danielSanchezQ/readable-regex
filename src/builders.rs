@@ -1,6 +1,18 @@
 use crate::ReadableRe;
 use std::fmt::{Display, Formatter};
 
+macro_rules! impl_builder_from_iter {
+    ($struct_name:ident) => {
+        impl<'a> FromIterator<ReadableRe<'a>> for $struct_name<'a> {
+            fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+                Self(Box::new(ReadableRe::Concat(Concat::new(
+                    iter.into_iter().collect::<Vec<_>>(),
+                ))))
+            }
+        }
+    };
+}
+
 /// Just a [`ReadableRe`] concatenation wrapper
 ///
 /// ## Example
@@ -76,6 +88,8 @@ impl<'a> Scape<'a> {
     }
 }
 
+impl_builder_from_iter!(Scape);
+
 /// Regex syntax for a regex group surrounded by parentheses of the regex input str
 /// ### Example
 /// ```
@@ -105,6 +119,8 @@ impl<'a> Display for Group<'a> {
         write!(f, "({})", self.0)
     }
 }
+
+impl_builder_from_iter!(Group);
 
 #[cfg(feature = "re-fancy")]
 /// Regex syntax for a positive lookahead assertion of the regex strings
@@ -148,6 +164,9 @@ impl<'a> Display for PositiveLookAhead<'a> {
 }
 
 #[cfg(feature = "re-fancy")]
+impl_builder_from_iter!(PositiveLookAhead);
+
+#[cfg(feature = "re-fancy")]
 /// Regex syntax for a negative lookahead assertion of the regex strings
 /// A lookahead matches text but does not consume it in the original parsed text.
 ///
@@ -189,6 +208,9 @@ impl<'a> Display for NegativeLookAhead<'a> {
 }
 
 #[cfg(feature = "re-fancy")]
+impl_builder_from_iter!(NegativeLookAhead);
+
+#[cfg(feature = "re-fancy")]
 /// Regex syntax for a positive lookbehind assertion of the input regexes.
 /// A lookbehind matches text but does not consume it in the original parsed text
 /// ## Example
@@ -226,6 +248,9 @@ impl<'a> Display for PositiveLookBehind<'a> {
         write!(f, "(?<={})", self.0)
     }
 }
+
+#[cfg(feature = "re-fancy")]
+impl_builder_from_iter!(PositiveLookBehind);
 
 #[cfg(feature = "re-fancy")]
 /// Negative lookbehind assertion of the regex input.
@@ -266,6 +291,9 @@ impl<'a> Display for NegativeLookBehind<'a> {
         write!(f, "(?<!{})", self.0)
     }
 }
+
+#[cfg(feature = "re-fancy")]
+impl_builder_from_iter!(NegativeLookBehind);
 
 /// Regex syntax for a named group of the regex strings in tuple_of_regex_strs.
 /// Named groups can be referred to by their name rather than their group number.
@@ -339,6 +367,8 @@ impl<'a> Display for NonCaptureGroup<'a> {
     }
 }
 
+impl_builder_from_iter!(NonCaptureGroup);
+
 /// Regex syntax for an optional part of the pattern of the regex strings in tuple_of_regex_strs
 ///
 /// ## Example
@@ -364,3 +394,5 @@ impl<'a> Display for Optional<'a> {
         write!(f, "{}?", self.0)
     }
 }
+
+impl_builder_from_iter!(Optional);
