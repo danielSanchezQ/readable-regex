@@ -465,6 +465,8 @@ impl<'a> Display for Exactly<'a> {
 }
 
 /// Regex syntax for matching an between the minimum and maximum number of occurrences of the input regex
+/// It accepts unbounded ranges. It also do not discriminate between open/closed ranges, and both
+/// works as including both ends.
 ///
 /// ## Example
 ///
@@ -493,6 +495,7 @@ trait BasicRangedExt {
     fn contains(&self, n: &usize) -> bool;
 }
 
+/// Helper trait to make RangedBounds object safe by constraining to usize
 impl<T> BasicRangedExt for T
 where
     T: RangeBounds<usize>,
@@ -540,3 +543,111 @@ impl<'a> Display for Ranged<'a> {
         write!(f, "{}{{{},{}}}", self.re, min, max)
     }
 }
+
+/// Regex syntax for matching zero or more occurrences of the input regex.
+/// This does a greedy match, which tries to make the largest match possible.
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::ReadableRe::Raw;
+/// use readable_regex::builders::{ZeroOrMore};
+/// let query = ZeroOrMore::new(Raw("abc"));
+/// assert_eq!(query.to_string(), "abc*")
+/// ```
+pub struct ZeroOrMore<'a>(Box<ReadableRe<'a>>);
+
+impl<'a> ZeroOrMore<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
+    }
+}
+
+impl<'a> Display for ZeroOrMore<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}*", self.0)
+    }
+}
+
+impl_builder_from_iter!(ZeroOrMore);
+
+/// Regex syntax for matching zero or more occurrences of the input regex.
+/// This does a lazy match, which tries to make the smallest match possible.
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::ReadableRe::Raw;
+/// use readable_regex::builders::{ZeroOrMoreLazy};
+/// let query = ZeroOrMoreLazy::new(Raw("abc"));
+/// assert_eq!(query.to_string(), "abc*?")
+/// ```
+pub struct ZeroOrMoreLazy<'a>(Box<ReadableRe<'a>>);
+
+impl<'a> ZeroOrMoreLazy<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
+    }
+}
+
+impl<'a> Display for ZeroOrMoreLazy<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}*?", self.0)
+    }
+}
+
+impl_builder_from_iter!(ZeroOrMoreLazy);
+
+/// Regex syntax for matching one or more occurrences of the input regex.
+/// This does a greedy match, which tries to make the largest match possible.
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::ReadableRe::Raw;
+/// use readable_regex::builders::{OneOrMore};
+/// let query = OneOrMore::new(Raw("abc"));
+/// assert_eq!(query.to_string(), "abc+")
+/// ```
+pub struct OneOrMore<'a>(Box<ReadableRe<'a>>);
+
+impl<'a> OneOrMore<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
+    }
+}
+
+impl<'a> Display for OneOrMore<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}+", self.0)
+    }
+}
+
+impl_builder_from_iter!(OneOrMore);
+
+/// Regex syntax for matching one or more occurrences of the input regex.
+/// This does a lazy match, which tries to make the smallest match possible.
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::ReadableRe::Raw;
+/// use readable_regex::builders::{OneOrMoreLazy};
+/// let query = OneOrMoreLazy::new(Raw("abc"));
+/// assert_eq!(query.to_string(), "abc+?")
+/// ```
+pub struct OneOrMoreLazy<'a>(Box<ReadableRe<'a>>);
+
+impl<'a> OneOrMoreLazy<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
+    }
+}
+
+impl<'a> Display for OneOrMoreLazy<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}+?", self.0)
+    }
+}
+
+impl_builder_from_iter!(OneOrMoreLazy);
