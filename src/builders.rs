@@ -1,5 +1,6 @@
 use crate::ReadableRe;
 use std::fmt::{Display, Formatter};
+use std::ops::{Bound, RangeBounds};
 
 macro_rules! impl_builder_from_iter {
     ($struct_name:ident) => {
@@ -430,5 +431,112 @@ impl<'a> FromIterator<ReadableRe<'a>> for Either<'a> {
         let mut concat = Concat::from_iter(iter);
         concat.0.pop();
         Self(concat)
+    }
+}
+
+/// Regex syntax for matching an exact number of occurrences of the input regex
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::Exactly;
+/// use readable_regex::ReadableRe::Raw;
+/// let query = Exactly::new(3, Raw("A"));
+/// assert_eq!(query.to_string(), "A{3}")
+/// ```
+pub struct Exactly<'a> {
+    quantity: usize,
+    re: Box<ReadableRe<'a>>,
+}
+
+impl<'a> Exactly<'a> {
+    pub fn new(quantity: usize, re: ReadableRe<'a>) -> Self {
+        Self {
+            quantity,
+            re: Box::new(re),
+        }
+    }
+}
+
+impl<'a> Display for Exactly<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}{{{}}}", self.re, self.quantity)
+    }
+}
+
+/// Regex syntax for matching an between the minimum and maximum number of occurrences of the input regex
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::Ranged;
+/// use readable_regex::ReadableRe::Raw;
+/// let query = Ranged::new(3..5, Raw("abc"));
+/// assert_eq!(query.to_string(), "abc{3,5}");
+/// let query = Ranged::new(..5, Raw("abc"));
+/// assert_eq!(query.to_string(), "abc{,5}");
+/// let query = Ranged::new(3.., Raw("abc"));
+/// assert_eq!(query.to_string(), "abc{3,}");
+/// let query = Ranged::new(.., Raw("abc"));
+/// assert_eq!(query.to_string(), "abc{,}");
+/// ```
+pub struct Ranged<'a> {
+    range: Box<dyn BasicRangedExt>,
+    re: Box<ReadableRe<'a>>,
+}
+
+trait BasicRangedExt {
+    fn min(&self) -> Bound<&usize>;
+
+    fn max(&self) -> Bound<&usize>;
+
+    fn contains(&self, n: &usize) -> bool;
+}
+
+impl<T> BasicRangedExt for T
+where
+    T: RangeBounds<usize>,
+{
+    fn min(&self) -> Bound<&usize> {
+        self.start_bound()
+    }
+
+    fn max(&self) -> Bound<&usize> {
+        self.end_bound()
+    }
+
+    fn contains(&self, n: &usize) -> bool {
+        RangeBounds::contains(self, n)
+    }
+}
+
+impl<'a> Ranged<'a> {
+    pub fn new<R>(range: R, re: ReadableRe<'a>) -> Self
+    where
+        R: RangeBounds<usize> + 'static,
+    {
+        Self {
+            range: Box::new(range),
+            re: Box::new(re),
+        }
+    }
+}
+
+impl<'a> Display for Ranged<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let (min, max) = match (self.range.min(), self.range.max()) {
+            (
+                Bound::Included(min) | Bound::Excluded(min),
+                Bound::Included(max) | Bound::Excluded(max),
+            ) => (min.to_string(), max.to_string()),
+            (Bound::Included(min) | Bound::Excluded(min), Bound::Unbounded) => {
+                (min.to_string(), "".to_string())
+            }
+            (Bound::Unbounded, Bound::Included(max) | Bound::Excluded(max)) => {
+                ("".to_string(), max.to_string())
+            }
+            (Bound::Unbounded, Bound::Unbounded) => ("".to_string(), "".to_string()),
+        };
+        write!(f, "{}{{{},{}}}", self.re, min, max)
     }
 }
