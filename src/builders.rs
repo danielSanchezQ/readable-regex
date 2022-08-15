@@ -651,3 +651,84 @@ impl<'a> Display for OneOrMoreLazy<'a> {
 }
 
 impl_builder_from_iter!(OneOrMoreLazy);
+
+/// Regex syntax for matching the pattern of the input regex at the start of the searched text.
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::StartsWith;
+/// use readable_regex::ReadableRe::Raw;
+/// let query = StartsWith::new(Raw("abc"));
+/// assert_eq!(query.to_string(), "^abc");
+/// ```
+pub struct StartsWith<'a>(Box<ReadableRe<'a>>);
+
+impl<'a> StartsWith<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
+    }
+}
+
+impl<'a> Display for StartsWith<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "^{}", self.0)
+    }
+}
+
+impl_builder_from_iter!(StartsWith);
+
+/// Regex syntax for matching the pattern of the input regex at the end of the searched text.
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::EndsWith;
+/// use readable_regex::ReadableRe::Raw;
+/// let query = EndsWith::new(Raw("abc"));
+/// assert_eq!(query.to_string(), "abc$");
+/// ```
+pub struct EndsWith<'a>(Box<ReadableRe<'a>>);
+
+impl<'a> EndsWith<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
+    }
+}
+
+impl<'a> Display for EndsWith<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}$", self.0)
+    }
+}
+
+impl_builder_from_iter!(EndsWith);
+
+/// Regex syntax for matching the pattern of the input regex at the start and end of the searched text.
+/// (That is, the pattern must match the complete searched text.)
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::StartsAndEndsWith;
+/// use readable_regex::ReadableRe::Raw;
+/// let query =  StartsAndEndsWith::new(Raw("abc"));
+/// assert_eq!(query.to_string(), "^abc$");
+/// ```
+pub struct StartsAndEndsWith<'a>(Box<ReadableRe<'a>>);
+
+impl<'a> StartsAndEndsWith<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(ReadableRe::StartsWith(StartsWith::new(
+            ReadableRe::EndsWith(EndsWith::new(re)),
+        ))))
+    }
+}
+
+impl<'a> Display for StartsAndEndsWith<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl_builder_from_iter!(StartsAndEndsWith);

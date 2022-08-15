@@ -105,6 +105,9 @@ pub enum ReadableRe<'a> {
     ZeroOrMoreLazy(builders::ZeroOrMoreLazy<'a>),
     OneOrMore(builders::OneOrMore<'a>),
     OneOrMoreLazy(builders::OneOrMoreLazy<'a>),
+    StartsWith(builders::StartsWith<'a>),
+    EndsWith(builders::EndsWith<'a>),
+    StartsAndEndsWith(builders::StartsAndEndsWith<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -194,6 +197,11 @@ impl Display for ReadableRe<'_> {
             ReadableRe::ZeroOrMoreLazy(zero_or_more_lazy) => zero_or_more_lazy as &dyn Display,
             ReadableRe::OneOrMore(one_or_more) => one_or_more as &dyn Display,
             ReadableRe::OneOrMoreLazy(one_or_more_lazy) => one_or_more_lazy as &dyn Display,
+            ReadableRe::StartsWith(starts_with) => starts_with as &dyn Display,
+            ReadableRe::EndsWith(ends_with) => ends_with as &dyn Display,
+            ReadableRe::StartsAndEndsWith(starts_and_ends_with) => {
+                starts_and_ends_with as &dyn Display
+            }
         };
         write!(f, "{}", to_write)
     }
