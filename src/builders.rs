@@ -732,3 +732,61 @@ impl<'a> Display for StartsAndEndsWith<'a> {
 }
 
 impl_builder_from_iter!(StartsAndEndsWith);
+
+/// Regex syntax for a character class including the characters in the input [`IntoIterator`]
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::Chars;
+/// let query = Chars::new("abc".chars());
+/// assert_eq!(query.to_string(), "[abc]");
+/// ```
+pub struct Chars(String);
+
+impl Chars {
+    pub fn new(iter: impl IntoIterator<Item = char>) -> Self {
+        Self::from_iter(iter)
+    }
+}
+
+impl Display for Chars {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}]", self.0)
+    }
+}
+
+impl FromIterator<char> for Chars {
+    fn from_iter<T: IntoIterator<Item = char>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}
+
+/// Regex syntax for a character class excluding the characters in the input [`IntoIterator`]
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::NotChars;
+/// let query = NotChars::new("abc".chars());
+/// assert_eq!(query.to_string(), "[^abc]");
+/// ```
+pub struct NotChars(String);
+
+impl NotChars {
+    pub fn new(iter: impl IntoIterator<Item = char>) -> Self {
+        Self::from_iter(iter)
+    }
+}
+
+impl Display for NotChars {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[^{}]", self.0)
+    }
+}
+
+impl FromIterator<char> for NotChars {
+    fn from_iter<T: IntoIterator<Item = char>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
+    }
+}

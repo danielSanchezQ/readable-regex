@@ -108,6 +108,8 @@ pub enum ReadableRe<'a> {
     StartsWith(builders::StartsWith<'a>),
     EndsWith(builders::EndsWith<'a>),
     StartsAndEndsWith(builders::StartsAndEndsWith<'a>),
+    Chars(builders::Chars),
+    NotChars(builders::NotChars),
 }
 
 impl Display for ReadableRe<'_> {
@@ -202,6 +204,8 @@ impl Display for ReadableRe<'_> {
             ReadableRe::StartsAndEndsWith(starts_and_ends_with) => {
                 starts_and_ends_with as &dyn Display
             }
+            ReadableRe::Chars(chars) => chars as &dyn Display,
+            ReadableRe::NotChars(not_chars) => not_chars as &dyn Display,
         };
         write!(f, "{}", to_write)
     }
