@@ -101,6 +101,10 @@ pub enum ReadableRe<'a> {
     Optional(builders::Optional<'a>),
     Either(builders::Either<'a>),
     Between(builders::Ranged<'a>),
+    ZeroOrMore(builders::ZeroOrMore<'a>),
+    ZeroOrMoreLazy(builders::ZeroOrMoreLazy<'a>),
+    OneOrMore(builders::OneOrMore<'a>),
+    OneOrMoreLazy(builders::OneOrMoreLazy<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -186,6 +190,10 @@ impl Display for ReadableRe<'_> {
             ReadableRe::Optional(optional) => optional as &dyn Display,
             ReadableRe::Either(either) => either as &dyn Display,
             ReadableRe::Between(between) => between as &dyn Display,
+            ReadableRe::ZeroOrMore(zero_or_more) => zero_or_more as &dyn Display,
+            ReadableRe::ZeroOrMoreLazy(zero_or_more_lazy) => zero_or_more_lazy as &dyn Display,
+            ReadableRe::OneOrMore(one_or_more) => one_or_more as &dyn Display,
+            ReadableRe::OneOrMoreLazy(one_or_more_lazy) => one_or_more_lazy as &dyn Display,
         };
         write!(f, "{}", to_write)
     }
