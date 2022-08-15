@@ -396,3 +396,39 @@ impl<'a> Display for Optional<'a> {
 }
 
 impl_builder_from_iter!(Optional);
+
+/// Regex syntax for the alternation or "or" operator of the patterns in iterator input,
+/// and the alternation is placed in a group
+///
+/// ## Examples
+///
+/// ```
+/// use readable_regex::builders::Either;
+/// use readable_regex::ReadableRe::Raw;
+/// assert_eq!(Either::new([Raw("a"), Raw("b"), Raw("c")]).to_string(), "a|b|c")
+/// ```
+pub struct Either<'a>(Concat<'a>);
+
+impl<'a> Either<'a> {
+    pub fn new(iter: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {
+        Self::from_iter(iter)
+    }
+}
+
+impl<'a> Display for Either<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl<'a> FromIterator<ReadableRe<'a>> for Either<'a> {
+    fn from_iter<T: IntoIterator<Item = ReadableRe<'a>>>(iter: T) -> Self {
+        let iter = iter
+            .into_iter()
+            .flat_map(|re| [re, ReadableRe::Raw("|")].into_iter());
+        // TODO: substitute with `interleave` when available
+        let mut concat = Concat::from_iter(iter);
+        concat.0.pop();
+        Self(concat)
+    }
+}

@@ -99,6 +99,7 @@ pub enum ReadableRe<'a> {
     NamedGroup(builders::NamedGroup<'a>),
     NonCaptureGroup(builders::NonCaptureGroup<'a>),
     Optional(builders::Optional<'a>),
+    Either(builders::Either<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -182,6 +183,7 @@ impl Display for ReadableRe<'_> {
             ReadableRe::NamedGroup(named_group) => named_group as &dyn Display,
             ReadableRe::NonCaptureGroup(non_capture_group) => non_capture_group as &dyn Display,
             ReadableRe::Optional(optional) => optional as &dyn Display,
+            ReadableRe::Either(either) => either as &dyn Display,
         };
         write!(f, "{}", to_write)
     }
