@@ -1,3 +1,5 @@
+#[allow(unused)]
+
 pub const DIGIT: &str = r"\d";
 pub const WORD: &str = r"\w";
 pub const WHITESPACE: &str = r"\s";
@@ -49,12 +51,21 @@ pub const TAB: &str = r"\t";
 pub const QUOTE: &str = r"\'";
 pub const DOUBLE_QUOTE: &str = r#"\""#;
 
+#[cfg(feature = "re-fancy")]
 pub const BACK_1: &str = r"\1";
+#[cfg(feature = "re-fancy")]
 pub const BACK_2: &str = r"\2";
+#[cfg(feature = "re-fancy")]
 pub const BACK_3: &str = r"\3";
+#[cfg(feature = "re-fancy")]
 pub const BACK_4: &str = r"\4";
+#[cfg(feature = "re-fancy")]
 pub const BACK_5: &str = r"\5";
+#[cfg(feature = "re-fancy")]
 pub const BACK_6: &str = r"\6";
+#[cfg(feature = "re-fancy")]
 pub const BACK_7: &str = r"\7";
+#[cfg(feature = "re-fancy")]
 pub const BACK_8: &str = r"\8";
+#[cfg(feature = "re-fancy")]
 pub const BACK_9: &str = r"\9";
