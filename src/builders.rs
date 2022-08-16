@@ -80,7 +80,7 @@ impl Display for Scape<'_> {
 }
 
 impl<'a> Scape<'a> {
-    pub fn from_str(s: &'a str) -> Self {
+    pub fn new_str(s: &'a str) -> Self {
         Self(Box::new(ReadableRe::Raw(s)))
     }
 
