@@ -1,3 +1,11 @@
+//! ### Regex for human beings.
+//!
+//! Regex is useful. But, sincerely, since code it is more read than written regex could
+//! be more understandable in a verbose mode.
+//!
+//! `readable-regex` crate is a set of tools to build those regexes in a verbose way. Which aims
+//! to improve readability of code.
+
 pub mod builders;
 mod constants;
 
@@ -12,70 +20,134 @@ use regex::Regex;
 use fancy_regex::Regex;
 
 #[cfg(any(feature = "re", feature = "re-fancy"))]
+/// Extension trait, compile any `Display` object into a regex
+/// Depending on the feature selected [`re`] or [`re-fancy`] one or the other regex backend is used.
 pub trait ReadableRegex: Display {
     fn compile(&self) -> Result<Regex, Error> {
         Regex::new(&format!("{self}"))
     }
 }
 
+/// Enum wrapper around regex expressions, it is a recursive version of regexes
 pub enum ReadableRe<'a> {
+    /// digit match, `"\d"`
     Digit,
+    /// word match, `"\w"`
     Word,
+    /// whitespace match, `"\s"`
     Whitespace,
+    /// non digit match, `"\D"`
     NonDigit,
+    /// non word match, `"\W"`
     NonWord,
+    /// non whitespace match, `"\S"`
     NonWhitespace,
+    /// boundary match, `"\b"`
     Boundary,
 
+    /// ascii letters match, `"[A-Za-z]"`
     AsciiLetter,
+    /// ascii non letters match, `"[^A-Za-z]"`
     AsciiNonLetter,
+    /// ascii uppercase letters match, `"[A-Z]"`
     AsciiUppercase,
+    /// ascii non uppercase letters match, `"[^A-Z]"`
     AsciiNonUppercase,
+    /// ascii lowercase letters match, `"[a-z]"`
     AsciiLowercase,
+    /// ascii non lowercase letters match, `"[^a-z]"`
     AsciiNonLowercase,
+    /// ascii alphanumerics chars match, `"[A-Za-z0-9]"`
     AsciiAlphanumeric,
+    /// ascii non alphanumerics chars match, `"[^A-Za-z0-9]"`
     AsciiNonAlphanumeric,
+    /// ascii numeric match, `"[0-9]"`
     AsciiNumeric,
+    /// ascii non numeric match, `"[^0-9]"`
     AsciiNonNumeric,
 
+    /// hexadecimal match, `"[0-9A-Fa-f]"`
     Hexadecimal,
+    /// non hexadecimal match, `"[^0-9A-Fa-f]"`
     NonHexadecimal,
 
+    /// anything match, `".*?"`
     Anything,
+    /// everything match, `".*"`
     Everything,
+    /// something match, greedy, `".+"`
     SomethingGreedy,
+    /// something match, `".+?"`
     Something,
+    /// any char match, `"."`
     AnyChar,
 
+    /// escaped period, `"\."`
     Period,
+    /// escaped caret, `"\^"`
     Caret,
+    /// escaped dollar, `"\$"`
     Dollar,
+    /// escaped asterisk, `"\*"`
     Asterisk,
+    /// escaped plus sign, `"\+"`
     PlusSign,
+    /// escaped minus sign, `"\-"`
     MinusSign,
+    /// escaped question mark, `"\?"`
     QuestionMark,
+    /// escaped open brace, `"\{"`
     OpenBrace,
+    /// escaped close brace, `"\}"`
     CloseBrace,
+    /// escaped open bracket, `"\["`
     OpenBracket,
+    /// escaped close bracket, `"\]"`
     CloseBracket,
+    /// escaped open parenthesis, `"\("`
     OpenParenthesis,
+    /// escaped close bracket, `"\)"`
     CloseParenthesis,
+    /// escaped back slash, `"\\"`
     BackSlash,
+    /// escaped pipe, `"\|"`
     Pipe,
 
+    /// escaped new line, `"\n"`
     Newline,
+    /// escaped tab, `"\t"`
     Tab,
+    /// escaped quote, `"\'"`
     Quote,
+    /// escaped double quote, `"\""`
     DoubleQuote,
 
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\1`
     Back1,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\2`
     Back2,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\3`
     Back3,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\4`
     Back4,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\5`
     Back5,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\6`
     Back6,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\7`
     Back7,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\8
     Back8,
+    #[cfg(feature = "re-fancy")]
+    /// back reference `\9`
     Back9,
 
     Raw(&'a str),
@@ -85,7 +157,7 @@ pub enum ReadableRe<'a> {
     #[cfg(feature = "re-fancy")]
     BackReference(builders::BackReference),
 
-    Scape(builders::Scape<'a>),
+    Escape(builders::Escape<'a>),
     Group(builders::Group<'a>),
 
     #[cfg(feature = "re-fancy")]
@@ -174,7 +246,7 @@ impl Display for ReadableRe<'_> {
             ReadableRe::Concat(concat) => concat as &dyn Display,
             #[cfg(feature = "re-fancy")]
             ReadableRe::BackReference(back_reference) => back_reference as &dyn Display,
-            ReadableRe::Scape(scape) => scape as &dyn Display,
+            ReadableRe::Escape(scape) => scape as &dyn Display,
             ReadableRe::Group(group) => group as &dyn Display,
             #[cfg(feature = "re-fancy")]
             ReadableRe::PositiveLookAhead(positive_look_ahead) => {
