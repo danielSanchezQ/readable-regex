@@ -66,20 +66,20 @@ impl Display for BackReference {
 /// A wrapper for re.escape(). Escape special characters in the input str
 /// ## Example
 /// ```
-/// use readable_regex::builders::Scape;
+/// use readable_regex::builders::Escape;
 /// use readable_regex::ReadableRe;
-/// let scaped = Scape::new_str("!#$%&");
+/// let scaped = Escape::new_str("!#$%&");
 /// assert_eq!(scaped.to_string(), "!\\#\\$%\\&");
 /// ```
-pub struct Scape<'a>(Box<ReadableRe<'a>>);
+pub struct Escape<'a>(Box<ReadableRe<'a>>);
 
-impl Display for Scape<'_> {
+impl Display for Escape<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", regex::escape(&self.0.to_string()))
     }
 }
 
-impl<'a> Scape<'a> {
+impl<'a> Escape<'a> {
     pub fn new_str(s: &'a str) -> Self {
         Self(Box::new(ReadableRe::Raw(s)))
     }
@@ -89,7 +89,7 @@ impl<'a> Scape<'a> {
     }
 }
 
-impl_builder_from_iter!(Scape);
+impl_builder_from_iter!(Escape);
 
 /// Regex syntax for a regex group surrounded by parentheses of the regex input str
 /// ### Example
