@@ -68,7 +68,7 @@ impl Display for BackReference {
 /// ```
 /// use readable_regex::builders::Scape;
 /// use readable_regex::ReadableRe;
-/// let scaped = Scape::from_str("!#$%&");
+/// let scaped = Scape::new_str("!#$%&");
 /// assert_eq!(scaped.to_string(), "!\\#\\$%\\&");
 /// ```
 pub struct Scape<'a>(Box<ReadableRe<'a>>);
