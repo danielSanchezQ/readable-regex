@@ -790,3 +790,33 @@ impl FromIterator<char> for NotChars {
         Self(iter.into_iter().collect())
     }
 }
+
+#[cfg(feature = "re-fancy")]
+/// Regex syntax for an atomic group of the input regex
+///
+/// ## Example
+///
+/// ```
+/// use readable_regex::builders::AtomicGroup;
+/// use readable_regex::ReadableRe::Raw;
+/// let query = AtomicGroup::new(Raw("foo"));
+/// assert_eq!(query.to_string(), "(?>foo)")
+/// ```
+pub struct AtomicGroup<'a>(Box<ReadableRe<'a>>);
+
+#[cfg(feature = "re-fancy")]
+impl<'a> AtomicGroup<'a> {
+    pub fn new(re: ReadableRe<'a>) -> Self {
+        Self(Box::new(re))
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl<'a> Display for AtomicGroup<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(?>{})", self.0)
+    }
+}
+
+#[cfg(feature = "re-fancy")]
+impl_builder_from_iter!(AtomicGroup);

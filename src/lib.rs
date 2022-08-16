@@ -110,6 +110,8 @@ pub enum ReadableRe<'a> {
     StartsAndEndsWith(builders::StartsAndEndsWith<'a>),
     Chars(builders::Chars),
     NotChars(builders::NotChars),
+    #[cfg(feature = "re-fancy")]
+    AtomicGroup(builders::AtomicGroup<'a>),
 }
 
 impl Display for ReadableRe<'_> {
@@ -206,6 +208,8 @@ impl Display for ReadableRe<'_> {
             }
             ReadableRe::Chars(chars) => chars as &dyn Display,
             ReadableRe::NotChars(not_chars) => not_chars as &dyn Display,
+            #[cfg(feature = "re-fancy")]
+            ReadableRe::AtomicGroup(atomic_group) => atomic_group as &dyn Display,
         };
         write!(f, "{}", to_write)
     }
