@@ -21,7 +21,7 @@ use fancy_regex::Regex;
 
 #[cfg(any(feature = "re", feature = "re-fancy"))]
 /// Extension trait, compile any `Display` object into a regex
-/// Depending on the feature selected [`re`] or [`re-fancy`] one or the other regex backend is used.
+/// Depending on the feature selected `re` or `re-fancy` one or the other regex backend is used.
 pub trait ReadableRegex: Display {
     fn compile(&self) -> Result<Regex, Error> {
         Regex::new(&format!("{self}"))
@@ -219,7 +219,7 @@ pub enum ReadableRe<'a> {
     Ranged(builders::Ranged<'a>),
     /// zero or more occurrences match, `"expr*"`, check [`builders::ZeroOrMore`]
     ZeroOrMore(builders::ZeroOrMore<'a>),
-    /// zero or more occurrences, lazy match, `"expr*?"`, , check [`builders::ZeroOrMoreLAzy`]
+    /// zero or more occurrences, lazy match, `"expr*?"`, , check [`builders::ZeroOrMoreLazy`]
     ZeroOrMoreLazy(builders::ZeroOrMoreLazy<'a>),
     /// one or more occurrences match, `"expr+"`, check [`builders::OneOrMore`]
     OneOrMore(builders::OneOrMore<'a>),
