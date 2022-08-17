@@ -63,23 +63,23 @@ impl Display for BackReference {
     }
 }
 
-/// A wrapper for re.escape(). Escape special characters in the input str
+/// A wrapper for [`regex::escape`]. Escape special characters in the input str
 /// ## Example
 /// ```
-/// use readable_regex::builders::Scape;
+/// use readable_regex::builders::Escape;
 /// use readable_regex::ReadableRe;
-/// let scaped = Scape::new_str("!#$%&");
+/// let scaped = Escape::new_str("!#$%&");
 /// assert_eq!(scaped.to_string(), "!\\#\\$%\\&");
 /// ```
-pub struct Scape<'a>(Box<ReadableRe<'a>>);
+pub struct Escape<'a>(Box<ReadableRe<'a>>);
 
-impl Display for Scape<'_> {
+impl Display for Escape<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", regex::escape(&self.0.to_string()))
     }
 }
 
-impl<'a> Scape<'a> {
+impl<'a> Escape<'a> {
     pub fn new_str(s: &'a str) -> Self {
         Self(Box::new(ReadableRe::Raw(s)))
     }
@@ -89,7 +89,7 @@ impl<'a> Scape<'a> {
     }
 }
 
-impl_builder_from_iter!(Scape);
+impl_builder_from_iter!(Escape);
 
 /// Regex syntax for a regex group surrounded by parentheses of the regex input str
 /// ### Example
@@ -254,7 +254,7 @@ impl<'a> Display for PositiveLookBehind<'a> {
 impl_builder_from_iter!(PositiveLookBehind);
 
 #[cfg(feature = "re-fancy")]
-/// Negative lookbehind assertion of the regex input.
+/// Negative lookbehind assertion of the input regex.
 /// A lookbehind matches text but does not consume it in the original parsed text
 ///
 /// ## Example
@@ -296,7 +296,7 @@ impl<'a> Display for NegativeLookBehind<'a> {
 #[cfg(feature = "re-fancy")]
 impl_builder_from_iter!(NegativeLookBehind);
 
-/// Regex syntax for a named group of the regex strings in tuple_of_regex_strs.
+/// Regex syntax for a named group of the input regex.
 /// Named groups can be referred to by their name rather than their group number.
 ///
 /// ## Examples
