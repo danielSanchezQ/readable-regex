@@ -63,7 +63,7 @@ impl Display for BackReference {
     }
 }
 
-/// A wrapper for re.escape(). Escape special characters in the input str
+/// A wrapper for [`regex::escape`]. Escape special characters in the input str
 /// ## Example
 /// ```
 /// use readable_regex::builders::Escape;
@@ -254,7 +254,7 @@ impl<'a> Display for PositiveLookBehind<'a> {
 impl_builder_from_iter!(PositiveLookBehind);
 
 #[cfg(feature = "re-fancy")]
-/// Negative lookbehind assertion of the regex input.
+/// Negative lookbehind assertion of the input regex.
 /// A lookbehind matches text but does not consume it in the original parsed text
 ///
 /// ## Example
@@ -296,7 +296,7 @@ impl<'a> Display for NegativeLookBehind<'a> {
 #[cfg(feature = "re-fancy")]
 impl_builder_from_iter!(NegativeLookBehind);
 
-/// Regex syntax for a named group of the regex strings in tuple_of_regex_strs.
+/// Regex syntax for a named group of the input regex.
 /// Named groups can be referred to by their name rather than their group number.
 ///
 /// ## Examples

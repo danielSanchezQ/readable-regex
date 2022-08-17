@@ -123,66 +123,121 @@ pub enum ReadableRe<'a> {
     DoubleQuote,
 
     #[cfg(feature = "re-fancy")]
-    /// back reference `\1`
+    /// back reference `"\1"`
+    ///
+    /// Available with feature `"re-fancy"`
     Back1,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\2`
+    /// back reference `"\2"`
+    ///
+    /// Available with feature `"re-fancy"`
     Back2,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\3`
+    /// back reference `"\3"`
+    ///
+    /// Available with feature `"re-fancy"`
     Back3,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\4`
+    /// back reference `"\4"`
+    ///
+    /// Available with feature `"re-fancy"`
     Back4,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\5`
+    /// back reference `"\5"`
+    /// Available with feature `"re-fancy"`
     Back5,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\6`
+    /// back reference `"\6"`
+    ///
+    /// Available with feature `"re-fancy"`
     Back6,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\7`
+    /// back reference `"\7"`
+    ///
+    /// Available with feature `"re-fancy"`
     Back7,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\8
+    /// back reference `"\8"
+    ///
+    /// Available with feature `"re-fancy"`
     Back8,
     #[cfg(feature = "re-fancy")]
-    /// back reference `\9`
+    /// back reference `"\9"`
+    ///
+    /// Available with feature `"re-fancy"`
     Back9,
 
+    /// raw regex exp, `"exp"`
     Raw(&'a str),
+    /// raw regex exp (owned), `"exp"`
     String(String),
+    /// concatenation of regex exp, `"exp1exp2exp3"`, check [`builders::Concat`]
     Concat(builders::Concat<'a>),
 
     #[cfg(feature = "re-fancy")]
+    /// `x` backreference, `"\x"`, check [`builders::BackReference`]
+    ///
+    /// Available with feature `"re-fancy"`
     BackReference(builders::BackReference),
 
+    /// Special characters escape wrapper, check [`builders::Escape`]
     Escape(builders::Escape<'a>),
+    /// Regex group, `"(expr)"`, check [`builders::Group`]
     Group(builders::Group<'a>),
 
     #[cfg(feature = "re-fancy")]
+    /// look ahead, `"(?=expr)"`, check [`builders::PositiveLookAhead`]
+    ///
+    /// Available with feature `"re-fancy"`
     PositiveLookAhead(builders::PositiveLookAhead<'a>),
     #[cfg(feature = "re-fancy")]
+    /// negative look ahead, `"(?!expr)"`, check [`builders::NegativeLookAhead`]
+    ///
+    /// Available with feature `"re-fancy"`
     NegativeLookAhead(builders::NegativeLookAhead<'a>),
     #[cfg(feature = "re-fancy")]
+    /// look behind, `"(?<=expr)"`, check [`builders::PositiveLookBehind`]
+    ///
+    /// Available with feature `"re-fancy"`
     PositiveLookBehind(builders::PositiveLookBehind<'a>),
     #[cfg(feature = "re-fancy")]
+    /// negative look behind, `"(?!expr)"`, check [`builders::NegativeLookBehind`]
+    ///
+    /// Available with feature `"re-fancy"`
     NegativeLookBehind(builders::NegativeLookBehind<'a>),
+    /// named group match, `"(?P<name>expr)"`, check [`builders::NamedGroup`]
     NamedGroup(builders::NamedGroup<'a>),
+    /// non-capture group, `"(?:expr)"`
     NonCaptureGroup(builders::NonCaptureGroup<'a>),
+    /// optional match, `"expr?"`, check [`builders::Optional`]
     Optional(builders::Optional<'a>),
+    /// either match, `"expr1|expr2|..."`, check [`builders::Either`]
     Either(builders::Either<'a>),
-    Between(builders::Ranged<'a>),
+    /// exact number (n) of occurrences match, `"expr{n}"`, check [`builders::Exactly`]
+    Exactly(builders::Exactly<'a>),
+    /// variance number (min, max) of occurrences match, `"expr{min, max}"`, check [`builders::Ranged`]
+    Ranged(builders::Ranged<'a>),
+    /// zero or more occurrences match, `"expr*"`, check [`builders::ZeroOrMore`]
     ZeroOrMore(builders::ZeroOrMore<'a>),
+    /// zero or more occurrences, lazy match, `"expr*?"`, , check [`builders::ZeroOrMoreLAzy`]
     ZeroOrMoreLazy(builders::ZeroOrMoreLazy<'a>),
+    /// one or more occurrences match, `"expr+"`, check [`builders::OneOrMore`]
     OneOrMore(builders::OneOrMore<'a>),
+    /// one or more occurrences, lazy match, `"expr+?"`, , check [`builders::OneOrMoreLazy`]
     OneOrMoreLazy(builders::OneOrMoreLazy<'a>),
+    /// match start, `"^expr"`, check [`builders::StartsWith`]
     StartsWith(builders::StartsWith<'a>),
+    /// match end, `"expr$"`, check [`builders::EndsWith`]
     EndsWith(builders::EndsWith<'a>),
+    /// match start and end, `"^expr$"`, check [`builders::StartsAndEndsWith`]
     StartsAndEndsWith(builders::StartsAndEndsWith<'a>),
+    /// match characters, `"[chars]"`, check [`builders::Chars`]
     Chars(builders::Chars),
+    /// exclude match characters, `"[^chars]"`, check [`builders::NotChars`]
     NotChars(builders::NotChars),
     #[cfg(feature = "re-fancy")]
+    /// match atomicly, `"(?>expr)"`, check [`builders::AtomicGroup`]
+    /// Available with feature `"re-fancy"`
     AtomicGroup(builders::AtomicGroup<'a>),
 }
 
@@ -269,7 +324,8 @@ impl Display for ReadableRe<'_> {
             ReadableRe::NonCaptureGroup(non_capture_group) => non_capture_group,
             ReadableRe::Optional(optional) => optional,
             ReadableRe::Either(either) => either,
-            ReadableRe::Between(between) => between,
+            ReadableRe::Exactly(exactly) => exactly,
+            ReadableRe::Ranged(between) => between,
             ReadableRe::ZeroOrMore(zero_or_more) => zero_or_more,
             ReadableRe::ZeroOrMoreLazy(zero_or_more_lazy) => zero_or_more_lazy,
             ReadableRe::OneOrMore(one_or_more) => one_or_more,
