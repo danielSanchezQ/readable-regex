@@ -19,7 +19,7 @@ macro_rules! impl_builder_from_iter {
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::Concat;
+/// use readable_regex::solvers::Concat;
 /// use readable_regex::ReadableRe::Raw;
 /// assert_eq!(&Concat::from_iter([Raw("foo"), Raw("bar")]).to_string(), "foobar");
 /// ```
@@ -50,7 +50,7 @@ impl<'a> Display for Concat<'a> {
 /// Returns a string in the regex syntax for a back reference, such as \1, \2, etc.
 /// ## Example
 /// ```
-/// use readable_regex::builders::BackReference;
+/// use readable_regex::solvers::BackReference;
 /// let back_3 = BackReference(3);
 /// assert_eq!(back_3.to_string(), "\\3");
 /// ```
@@ -66,7 +66,7 @@ impl Display for BackReference {
 /// A wrapper for [`regex::escape`]. Escape special characters in the input str
 /// ## Example
 /// ```
-/// use readable_regex::builders::Escape;
+/// use readable_regex::solvers::Escape;
 /// use readable_regex::ReadableRe;
 /// let scaped = Escape::new_str("!#$%&");
 /// assert_eq!(scaped.to_string(), "!\\#\\$%\\&");
@@ -94,7 +94,7 @@ impl_builder_from_iter!(Escape);
 /// Regex syntax for a regex group surrounded by parentheses of the regex input str
 /// ### Example
 /// ```
-/// use readable_regex::builders::{Concat, Group};
+/// use readable_regex::solvers::{Concat, Group};
 /// use readable_regex::ReadableRe::{self, Raw};
 /// assert_eq!(Group::new(Raw("cat")).to_string(), "(cat)");
 /// assert_eq!(Group::new(ReadableRe::Concat(Concat::new([Raw("cat"), Raw("dog"), Raw("moose")]))).to_string(), "(catdogmoose)");
@@ -133,8 +133,8 @@ impl_builder_from_iter!(Group);
 /// 'kitty'. Note that the match only includes 'kitty' and not 'kittycat'.
 ///
 /// ```
-/// use readable_regex::builders::{Concat, PositiveLookAhead};
-/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use readable_regex::solvers::{Concat, PositiveLookAhead};
+/// use readable_regex::ReadableRe;
 /// use std::fmt::Display;
 /// let query = Concat::new([
 ///     ReadableRe::Raw("kitty"),
@@ -177,8 +177,8 @@ impl_builder_from_iter!(PositiveLookAhead);
 /// does not follow 'kitty'. Note that the match only includes 'kitty' and not 'kittycat'
 ///
 /// ```
-/// use readable_regex::builders::{Concat, NegativeLookAhead};
-/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use readable_regex::solvers::{Concat, NegativeLookAhead};
+/// use readable_regex::ReadableRe;
 /// use std::fmt::Display;
 /// let query = Concat::new([
 ///     ReadableRe::Raw("kitty"),
@@ -220,8 +220,8 @@ impl_builder_from_iter!(NegativeLookAhead);
 /// Note that the match only includes 'cat' and not 'kittycat'.
 ///
 /// ```
-/// use readable_regex::builders::{Concat, PositiveLookBehind};
-/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use readable_regex::solvers::{Concat, PositiveLookBehind};
+/// use readable_regex::ReadableRe;
 /// use std::fmt::Display;
 /// let query = Concat::new([
 ///     ReadableRe::PositiveLookBehind(PositiveLookBehind::new(ReadableRe::Raw("kitty"))),
@@ -263,8 +263,8 @@ impl_builder_from_iter!(PositiveLookBehind);
 /// before 'cat'. Note that the match only includes 'cat' and not 'kittycat'.
 ///
 /// ```
-/// use readable_regex::builders::{Concat, NegativeLookBehind};
-/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use readable_regex::solvers::{Concat, NegativeLookBehind};
+/// use readable_regex::ReadableRe;
 /// use std::fmt::Display;
 /// let query = Concat::from_iter([
 ///     ReadableRe::NegativeLookBehind(NegativeLookBehind::new(ReadableRe::Raw("kitty"))),
@@ -302,7 +302,7 @@ impl_builder_from_iter!(NegativeLookBehind);
 /// ## Examples
 ///
 /// ```
-/// use readable_regex::builders::NamedGroup;
+/// use readable_regex::solvers::NamedGroup;
 /// use readable_regex::ReadableRe::Raw;
 /// use std::fmt::Display;
 /// assert_eq!(
@@ -343,8 +343,8 @@ impl<'a> Display for NamedGroup<'a> {
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::{Concat, NonCaptureGroup};
-/// use readable_regex::{ReadableRe, ReadableRegex};
+/// use readable_regex::solvers::{Concat, NonCaptureGroup};
+/// use readable_regex::ReadableRe;
 /// use std::fmt::Display;
 /// let query = ReadableRe::NonCaptureGroup(
 ///     NonCaptureGroup::new(ReadableRe::Raw("pattern_to_look_for"))
@@ -374,7 +374,7 @@ impl_builder_from_iter!(NonCaptureGroup);
 ///
 /// ## Example
 /// ```
-/// use readable_regex::builders::Optional;
+/// use readable_regex::solvers::Optional;
 /// use readable_regex::ReadableRe::{self, Raw};
 /// let query = ReadableRe::Optional(Optional::new(Raw("foo")));
 /// assert_eq!(
@@ -404,7 +404,7 @@ impl_builder_from_iter!(Optional);
 /// ## Examples
 ///
 /// ```
-/// use readable_regex::builders::Either;
+/// use readable_regex::solvers::Either;
 /// use readable_regex::ReadableRe::Raw;
 /// assert_eq!(Either::new([Raw("a"), Raw("b"), Raw("c")]).to_string(), "a|b|c")
 /// ```
@@ -439,7 +439,7 @@ impl<'a> FromIterator<ReadableRe<'a>> for Either<'a> {
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::Exactly;
+/// use readable_regex::solvers::Exactly;
 /// use readable_regex::ReadableRe::Raw;
 /// let query = Exactly::new(3, Raw("A"));
 /// assert_eq!(query.to_string(), "A{3}")
@@ -471,7 +471,7 @@ impl<'a> Display for Exactly<'a> {
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::Ranged;
+/// use readable_regex::solvers::Ranged;
 /// use readable_regex::ReadableRe::Raw;
 /// let query = Ranged::new(3..5, Raw("abc"));
 /// assert_eq!(query.to_string(), "abc{3,5}");
@@ -551,7 +551,7 @@ impl<'a> Display for Ranged<'a> {
 ///
 /// ```
 /// use readable_regex::ReadableRe::Raw;
-/// use readable_regex::builders::{ZeroOrMore};
+/// use readable_regex::solvers::{ZeroOrMore};
 /// let query = ZeroOrMore::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc*")
 /// ```
@@ -578,7 +578,7 @@ impl_builder_from_iter!(ZeroOrMore);
 ///
 /// ```
 /// use readable_regex::ReadableRe::Raw;
-/// use readable_regex::builders::{ZeroOrMoreLazy};
+/// use readable_regex::solvers::{ZeroOrMoreLazy};
 /// let query = ZeroOrMoreLazy::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc*?")
 /// ```
@@ -605,7 +605,7 @@ impl_builder_from_iter!(ZeroOrMoreLazy);
 ///
 /// ```
 /// use readable_regex::ReadableRe::Raw;
-/// use readable_regex::builders::{OneOrMore};
+/// use readable_regex::solvers::{OneOrMore};
 /// let query = OneOrMore::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc+")
 /// ```
@@ -632,7 +632,7 @@ impl_builder_from_iter!(OneOrMore);
 ///
 /// ```
 /// use readable_regex::ReadableRe::Raw;
-/// use readable_regex::builders::{OneOrMoreLazy};
+/// use readable_regex::solvers::{OneOrMoreLazy};
 /// let query = OneOrMoreLazy::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc+?")
 /// ```
@@ -657,7 +657,7 @@ impl_builder_from_iter!(OneOrMoreLazy);
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::StartsWith;
+/// use readable_regex::solvers::StartsWith;
 /// use readable_regex::ReadableRe::Raw;
 /// let query = StartsWith::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "^abc");
@@ -683,7 +683,7 @@ impl_builder_from_iter!(StartsWith);
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::EndsWith;
+/// use readable_regex::solvers::EndsWith;
 /// use readable_regex::ReadableRe::Raw;
 /// let query = EndsWith::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc$");
@@ -710,7 +710,7 @@ impl_builder_from_iter!(EndsWith);
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::StartsAndEndsWith;
+/// use readable_regex::solvers::StartsAndEndsWith;
 /// use readable_regex::ReadableRe::Raw;
 /// let query =  StartsAndEndsWith::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "^abc$");
@@ -738,7 +738,7 @@ impl_builder_from_iter!(StartsAndEndsWith);
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::Chars;
+/// use readable_regex::solvers::Chars;
 /// let query = Chars::new("abc".chars());
 /// assert_eq!(query.to_string(), "[abc]");
 /// ```
@@ -767,7 +767,7 @@ impl FromIterator<char> for Chars {
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::NotChars;
+/// use readable_regex::solvers::NotChars;
 /// let query = NotChars::new("abc".chars());
 /// assert_eq!(query.to_string(), "[^abc]");
 /// ```
@@ -797,7 +797,7 @@ impl FromIterator<char> for NotChars {
 /// ## Example
 ///
 /// ```
-/// use readable_regex::builders::AtomicGroup;
+/// use readable_regex::solvers::AtomicGroup;
 /// use readable_regex::ReadableRe::Raw;
 /// let query = AtomicGroup::new(Raw("foo"));
 /// assert_eq!(query.to_string(), "(?>foo)")
