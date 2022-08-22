@@ -1,5 +1,3 @@
-#[allow(unused)]
-
 pub const DIGIT: &str = r"\d";
 pub const WORD: &str = r"\w";
 pub const WHITESPACE: &str = r"\s";
