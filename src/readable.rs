@@ -344,9 +344,8 @@ impl<'a> Add<Self> for ReadableRe<'a> {
                 v1.push(other);
                 Self::Concat(solvers::Concat(v1))
             }
-            (other, Self::Concat(solvers::Concat(mut v1))) => {
-                v1.insert(0, other);
-                Self::Concat(solvers::Concat(v1))
+            (other, Self::Concat(solvers::Concat(v1))) => {
+                Self::Concat(solvers::Concat::new(std::iter::once(other).chain(v1)))
             }
             (re1, re2) => Self::Concat(solvers::Concat::new([re1, re2])),
         }
