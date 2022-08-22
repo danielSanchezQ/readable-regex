@@ -23,7 +23,7 @@ macro_rules! impl_builder_from_iter {
 /// use readable_regex::ReadableRe::Raw;
 /// assert_eq!(&Concat::from_iter([Raw("foo"), Raw("bar")]).to_string(), "foobar");
 /// ```
-pub struct Concat<'a>(Vec<ReadableRe<'a>>);
+pub struct Concat<'a>(pub(crate) Vec<ReadableRe<'a>>);
 
 impl<'a> Concat<'a> {
     pub fn new(v: impl IntoIterator<Item = ReadableRe<'a>>) -> Self {

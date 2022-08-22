@@ -335,6 +335,20 @@ impl<'a> Add<Self> for ReadableRe<'a> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self::Concat(solvers::Concat::new([self, rhs]))
+        match (self, rhs) {
+            (Self::Concat(solvers::Concat(mut v1)), Self::Concat(solvers::Concat(v2))) => {
+                v1.extend(v2);
+                Self::Concat(solvers::Concat(v1))
+            }
+            (Self::Concat(solvers::Concat(mut v1)), other) => {
+                v1.push(other);
+                Self::Concat(solvers::Concat(v1))
+            }
+            (other, Self::Concat(solvers::Concat(mut v1))) => {
+                v1.insert(0, other);
+                Self::Concat(solvers::Concat(v1))
+            }
+            (re1, re2) => Self::Concat(solvers::Concat::new([re1, re2])),
+        }
     }
 }
