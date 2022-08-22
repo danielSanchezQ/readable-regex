@@ -1,4 +1,4 @@
-A# Readable regex
+# Readable regex
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![GHA Build Status](https://github.com/danielsanchezq/readable-regex/workflows/CI/badge.svg)](https://github.com/danielsanchezq/readable-regex/actions?query=workflow%3ACI)
