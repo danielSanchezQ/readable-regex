@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter};
+use std::ops::Add;
 
 use regex::Error;
 
@@ -327,5 +328,13 @@ impl Display for ReadableRe<'_> {
 impl<'a> ReadableRe<'a> {
     pub fn compile(&self) -> Result<Regex, Error> {
         Regex::new(&format!("{self}"))
+    }
+}
+
+impl<'a> Add<Self> for ReadableRe<'a> {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Concat(solvers::Concat::new([self, rhs]))
     }
 }
