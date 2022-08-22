@@ -271,3 +271,146 @@ fn test_not_chars() {
     assert_eq!(not_chars("A-Z".chars()).to_string(), "[^A-Z]");
     assert_eq!(not_chars(['c', 'a', 't']).to_string(), "[^cat]");
 }
+
+#[test]
+fn test_hexadecimal() {
+    let re = hexadecimal().compile().unwrap();
+    // match A-F, a-f, 0-9
+    for c in (65..71).chain(97..103).chain(48..58) {
+        assert!(re.is_match(&char::from(c).to_string()));
+    }
+    // no match A-F, a-f, 0-9
+    for c in (71..91).chain(103..123).chain(192..255).chain(33..48) {
+        assert!(!re.is_match(&char::from(c).to_string()));
+    }
+}
+
+#[test]
+fn test_non_hexadecimal() {
+    let re = non_hexadecimal().compile().unwrap();
+    // match A-F, a-f, 0-9
+    for c in (65..71).chain(97..103).chain(48..58) {
+        assert!(!re.is_match(&char::from(c).to_string()));
+    }
+    // no match A-F, a-f, 0-9
+    for c in (71..91).chain(103..123).chain(192..255).chain(33..48) {
+        assert!(re.is_match(&char::from(c).to_string()));
+    }
+}
+
+#[test]
+fn test_ascii_letter() {
+    let letter = ascii_letter().compile().unwrap();
+    for c in (0u8..255).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if c.is_ascii_alphabetic() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_ascii_lowercase() {
+    let letter = ascii_lowercase().compile().unwrap();
+    for c in (0u8..255).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if c.is_ascii_lowercase() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_ascii_not_lowercase() {
+    let letter = ascii_non_lowercase().compile().unwrap();
+    for c in (0u8..255).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if !c.is_ascii_lowercase() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_ascii_uppercase() {
+    let letter = ascii_uppercase().compile().unwrap();
+    for c in (0u8..255).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if c.is_ascii_uppercase() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_not_ascii_uppercase() {
+    let letter = ascii_non_uppercase().compile().unwrap();
+    for c in (0u8..255).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if !c.is_ascii_uppercase() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_ascii_alphanumeric() {
+    let letter = ascii_alphanumeric().compile().unwrap();
+    for c in (0u8..255).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if c.is_ascii_alphanumeric() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_not_ascii_alphanumeric() {
+    let letter = ascii_non_alphanumeric().compile().unwrap();
+    for c in (0u8..255).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if !c.is_ascii_alphanumeric() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_ascii_numeric() {
+    let letter = ascii_numeric().compile().unwrap();
+    for c in (0u8..128).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if c.is_numeric() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
+
+#[test]
+fn test_not_ascii_numeric() {
+    let letter = ascii_non_numeric().compile().unwrap();
+    for c in (0u8..128).map(char::from) {
+        let res = letter.is_match(&c.to_string());
+        if !c.is_numeric() {
+            assert!(res);
+        } else {
+            assert!(!res);
+        }
+    }
+}
