@@ -351,3 +351,15 @@ impl<'a> Add<Self> for ReadableRe<'a> {
         }
     }
 }
+
+impl<'a> From<&'a str> for ReadableRe<'a> {
+    fn from(s: &'a str) -> Self {
+        Self::Raw(s)
+    }
+}
+
+impl<'a> From<String> for ReadableRe<'a> {
+    fn from(s: String) -> Self {
+        Self::String(s)
+    }
+}
