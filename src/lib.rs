@@ -313,6 +313,14 @@ where
     ReadableRe::Ranged(solvers::Ranged::new(range, re))
 }
 
+pub fn at_least(n: usize, re: ReadableRe) -> ReadableRe {
+    ReadableRe::Ranged(solvers::Ranged::new(n.., re))
+}
+
+pub fn at_most(n: usize, re: ReadableRe) -> ReadableRe {
+    ReadableRe::Ranged(solvers::Ranged::new(..n, re))
+}
+
 pub fn zero_or_more(re: ReadableRe) -> ReadableRe {
     ReadableRe::ZeroOrMore(solvers::ZeroOrMore::new(re))
 }
