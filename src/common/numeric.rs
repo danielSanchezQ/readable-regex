@@ -3,26 +3,45 @@ use crate::*;
 use once_cell::sync::Lazy;
 
 const POSITIVE_INTEGER: Lazy<ReadableRe> = Lazy::new(|| starts_and_ends_with(one_or_more(Digit)));
+
 const NEGATIVE_INTEGER: Lazy<ReadableRe> =
     Lazy::new(|| starts_and_ends_with(MinusSign + one_or_more(Digit)));
+
 const INTEGER: Lazy<ReadableRe> =
     Lazy::new(|| starts_and_ends_with(optional(MinusSign) + one_or_more(Digit)));
+
 const POSITIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
-    starts_and_ends_with(zero_or_more(Digit) + chars(".,".chars()) + one_or_more(Digit))
+    starts_and_ends_with(
+        group(zero_or_more(Digit)) + chars(".,".chars()) + group(one_or_more(Digit)),
+    )
 });
+
 const NEGATIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
-    starts_and_ends_with(MinusSign + zero_or_more(Digit) + chars(".,".chars()) + one_or_more(Digit))
+    starts_and_ends_with(
+        MinusSign + group(zero_or_more(Digit)) + chars(".,".chars()) + group(one_or_more(Digit)),
+    )
 });
+
 const DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(
-        optional(MinusSign) + zero_or_more(Digit) + chars(".,".chars()) + one_or_more(Digit),
+        optional(MinusSign)
+            + group(zero_or_more(Digit))
+            + chars(".,".chars())
+            + group(one_or_more(Digit)),
     )
+});
+
+const FRACTION: Lazy<ReadableRe> = Lazy::new(|| {
+    starts_and_ends_with(group(
+        one_or_more(Digit) + chars("/\\\\".chars()) + group(one_or_more(Digit)),
+    ))
 });
 
 #[cfg(test)]
 mod tests {
     use crate::common::numeric::{
-        DECIMAL, INTEGER, NEGATIVE_DECIMAL, NEGATIVE_INTEGER, POSITIVE_DECIMAL, POSITIVE_INTEGER,
+        DECIMAL, FRACTION, INTEGER, NEGATIVE_DECIMAL, NEGATIVE_INTEGER, POSITIVE_DECIMAL,
+        POSITIVE_INTEGER,
     };
 
     #[test]
@@ -67,5 +86,13 @@ mod tests {
         assert!(query.is_match("-12345.67890"));
         assert!(query.is_match("12345.67890"));
         assert!(!query.is_match("-12345.67890a"));
+    }
+
+    #[test]
+    fn fraction() {
+        let query = FRACTION.compile().unwrap();
+        assert!(query.is_match("9/6"));
+        assert!(query.is_match("9\\6"));
+        assert!(!query.is_match("9/a"));
     }
 }
