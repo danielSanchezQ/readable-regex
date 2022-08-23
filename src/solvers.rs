@@ -742,27 +742,21 @@ impl_builder_from_iter!(StartsAndEndsWith);
 ///
 /// ```
 /// use readable_regex::solvers::Chars;
-/// let query = Chars::new("abc".chars());
+/// let query = Chars::new("abc");
 /// assert_eq!(query.to_string(), "[abc]");
 /// ```
 #[derive(Clone)]
 pub struct Chars(String);
 
 impl Chars {
-    pub fn new(iter: impl IntoIterator<Item = char>) -> Self {
-        Self::from_iter(iter)
+    pub fn new(s: &str) -> Self {
+        Self(s.to_string())
     }
 }
 
 impl Display for Chars {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "[{}]", self.0)
-    }
-}
-
-impl FromIterator<char> for Chars {
-    fn from_iter<T: IntoIterator<Item = char>>(iter: T) -> Self {
-        Self(iter.into_iter().collect())
     }
 }
 

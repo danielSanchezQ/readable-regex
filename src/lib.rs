@@ -351,8 +351,8 @@ pub fn starts_and_ends_with(re: ReadableRe) -> ReadableRe {
     ReadableRe::StartsAndEndsWith(solvers::StartsAndEndsWith::new(re))
 }
 
-pub fn chars<'a>(iter: impl IntoIterator<Item = char>) -> ReadableRe<'a> {
-    ReadableRe::Chars(solvers::Chars::new(iter))
+pub fn chars(re: &str) -> ReadableRe {
+    ReadableRe::Chars(solvers::Chars::new(re))
 }
 
 pub fn not_chars<'a>(iter: impl IntoIterator<Item = char>) -> ReadableRe<'a> {

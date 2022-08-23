@@ -89,14 +89,14 @@ fn big_ass_query() {
 #[test]
 fn some_chars() {
     let query = "[YZ][BCE-HMO-Y][BEFN][A-Z][0-9][0-9]_KWBC_[0-9]{6}";
-    let re = chars("YZ".chars())
-        + chars("BCE-HMO-Y".chars())
-        + chars("BEFN".chars())
-        + chars("A-Z".chars())
-        + chars("0-9".chars())
-        + chars("0-9".chars())
+    let re = chars("YZ")
+        + chars("BCE-HMO-Y")
+        + chars("BEFN")
+        + chars("A-Z")
+        + chars("0-9")
+        + chars("0-9")
         + Raw("_KWBC_")
-        + exactly(6, chars("0-9".chars()));
+        + exactly(6, chars("0-9"));
     assert_eq!(re.to_string(), query);
 }
 
@@ -105,12 +105,12 @@ fn check_sum_match() {
     let printable = r#"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"\#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c"#;
     let query = format!("Check[ ]?sum[ ]+is[ ]+([{}])", printable);
     let re: ReadableRe = Raw("Check")
-        + optional(chars(" ".chars()))
+        + optional(chars(" "))
         + "sum".into()
-        + one_or_more(chars(" ".chars()))
+        + one_or_more(chars(" "))
         + "is".into()
-        + one_or_more(chars(" ".chars()))
-        + group(chars(printable.chars()));
+        + one_or_more(chars(" "))
+        + group(chars(printable));
 
     assert_eq!(re.to_string(), query);
 }
@@ -262,8 +262,8 @@ fn test_starts_and_ends_with() {
 
 #[test]
 fn test_chars() {
-    assert_eq!(chars("A-Z".chars()).to_string(), "[A-Z]");
-    assert_eq!(chars(['c', 'a', 't']).to_string(), "[cat]");
+    assert_eq!(chars("A-Z").to_string(), "[A-Z]");
+    assert_eq!(chars("cat").to_string(), "[cat]");
 }
 
 #[test]

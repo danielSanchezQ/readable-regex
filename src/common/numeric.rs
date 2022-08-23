@@ -11,29 +11,24 @@ const INTEGER: Lazy<ReadableRe> =
     Lazy::new(|| starts_and_ends_with(optional(MinusSign) + one_or_more(Digit)));
 
 const POSITIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
-    starts_and_ends_with(
-        group(zero_or_more(Digit)) + chars(".,".chars()) + group(one_or_more(Digit)),
-    )
+    starts_and_ends_with(group(zero_or_more(Digit)) + chars(".,") + group(one_or_more(Digit)))
 });
 
 const NEGATIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(
-        MinusSign + group(zero_or_more(Digit)) + chars(".,".chars()) + group(one_or_more(Digit)),
+        MinusSign + group(zero_or_more(Digit)) + chars(".,") + group(one_or_more(Digit)),
     )
 });
 
 const DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(
-        optional(MinusSign)
-            + group(zero_or_more(Digit))
-            + chars(".,".chars())
-            + group(one_or_more(Digit)),
+        optional(MinusSign) + group(zero_or_more(Digit)) + chars(".,") + group(one_or_more(Digit)),
     )
 });
 
 const FRACTION: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(group(
-        one_or_more(Digit) + chars("/\\\\".chars()) + group(one_or_more(Digit)),
+        one_or_more(Digit) + chars("/\\\\") + group(one_or_more(Digit)),
     ))
 });
 
