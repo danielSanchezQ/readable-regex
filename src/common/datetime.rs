@@ -66,10 +66,13 @@ const HOURS_24: Lazy<ReadableRe> = Lazy::new(|| {
     ])
 });
 
+const MERIDIEMS: Lazy<ReadableRe> =
+    Lazy::new(|| either([chars("ap") + "m".into(), chars("AP") + chars("Mm")]));
+
 #[cfg(test)]
 mod tests {
     use crate::common::datetime::{
-        DATE_D_M_Y, DATE_Y_M_D, DAY, HOURS_12, HOURS_24, MIN_SEC, MONTH, YEAR,
+        DATE_D_M_Y, DATE_Y_M_D, DAY, HOURS_12, HOURS_24, MERIDIEMS, MIN_SEC, MONTH, YEAR,
     };
     use std::fmt::format;
 
@@ -154,5 +157,18 @@ mod tests {
             let v = format!("{i:02}");
             assert!(!query.is_match(&v), "Failed matching: {}", v);
         }
+    }
+
+    #[test]
+    fn meridiems() {
+        let query = MERIDIEMS.compile().unwrap();
+        assert!(query.is_match("am"));
+        assert!(query.is_match("Am"));
+        assert!(query.is_match("AM"));
+        assert!(query.is_match("pm"));
+        assert!(query.is_match("Pm"));
+        assert!(query.is_match("PM"));
+        assert!(!query.is_match("aM"));
+        assert!(!query.is_match("pM"));
     }
 }
