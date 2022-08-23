@@ -55,7 +55,7 @@ const MIN_SEC: Lazy<ReadableRe> = Lazy::new(|| chars("0-5") + chars("0-9"));
 
 /// Hours 12h format
 const HOURS_12: Lazy<ReadableRe> =
-    Lazy::new(|| either([Raw("0") + chars("0-9"), Raw("1") + chars("12")]));
+    Lazy::new(|| either([Raw("0") + chars("0-9"), Raw("1") + chars("0-2")]));
 
 /// Hours 24h format
 const HOURS_24: Lazy<ReadableRe> = Lazy::new(|| {
@@ -68,7 +68,9 @@ const HOURS_24: Lazy<ReadableRe> = Lazy::new(|| {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::datetime::{DATE_D_M_Y, DATE_Y_M_D, DAY, MONTH, YEAR};
+    use crate::common::datetime::{
+        DATE_D_M_Y, DATE_Y_M_D, DAY, HOURS_12, HOURS_24, MIN_SEC, MONTH, YEAR,
+    };
     use std::fmt::format;
 
     #[test]
@@ -117,5 +119,40 @@ mod tests {
         assert!(query.is_match("18/04/2022"));
         assert!(query.is_match("18-04-2022"));
         assert!(query.is_match("18\\04\\2022"));
+    }
+
+    #[test]
+    fn min_sec() {
+        let query = MIN_SEC.compile().unwrap();
+        for i in 0..60 {
+            assert!(query.is_match(&format!("{i:02}")));
+        }
+        assert!(!query.is_match("60"));
+    }
+
+    #[test]
+    fn hour_12() {
+        let query = HOURS_12.compile().unwrap();
+        for i in 0..13 {
+            let v = format!("{i:02}");
+            assert!(query.is_match(&v), "Failed matching: {}", v);
+        }
+        for i in 13..25 {
+            let v = format!("{i:02}");
+            assert!(!query.is_match(&v), "Failed matching: {}", v);
+        }
+    }
+
+    #[test]
+    fn hour_24() {
+        let query = HOURS_24.compile().unwrap();
+        for i in 0..25 {
+            let v = format!("{i:02}");
+            assert!(query.is_match(&v), "Failed matching: {}", v);
+        }
+        for i in 25..99 {
+            let v = format!("{i:02}");
+            assert!(!query.is_match(&v), "Failed matching: {}", v);
+        }
     }
 }
