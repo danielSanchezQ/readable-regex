@@ -3,7 +3,7 @@ use crate::{chars, either, exactly, group, optional, starts_and_ends_with, Reada
 use once_cell::sync::Lazy;
 
 /// Month day, `01`-`31`
-const DAY: Lazy<ReadableRe> = Lazy::new(|| {
+pub const DAY: Lazy<ReadableRe> = Lazy::new(|| {
     either([
         Raw("0") + chars("1-9"),
         chars("12") + Digit,
@@ -12,11 +12,11 @@ const DAY: Lazy<ReadableRe> = Lazy::new(|| {
 });
 
 /// Month numeral, `01`-`12`
-const MONTH: Lazy<ReadableRe> =
+pub const MONTH: Lazy<ReadableRe> =
     Lazy::new(|| either([Raw("0") + chars("1-9"), Raw("1") + chars("0-2")]));
 
 /// Calendar month, `Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec`
-const MONTH_CALENDAR: Lazy<ReadableRe> = Lazy::new(|| {
+pub const MONTH_CALENDAR: Lazy<ReadableRe> = Lazy::new(|| {
     either(
         [
             "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -26,10 +26,10 @@ const MONTH_CALENDAR: Lazy<ReadableRe> = Lazy::new(|| {
 });
 
 /// Years from `1000` to `2999`
-const YEAR: Lazy<ReadableRe> = Lazy::new(|| chars("12") + exactly(3, Digit));
+pub const YEAR: Lazy<ReadableRe> = Lazy::new(|| chars("12") + exactly(3, Digit));
 
 /// Date Format `YYYY-MM-dd`
-const DATE_Y_M_D: Lazy<ReadableRe> = Lazy::new(|| {
+pub const DATE_Y_M_D: Lazy<ReadableRe> = Lazy::new(|| {
     group(
         group(YEAR.clone())
             + chars(r"-/.\\")
@@ -40,7 +40,7 @@ const DATE_Y_M_D: Lazy<ReadableRe> = Lazy::new(|| {
 });
 
 /// Date Format `YYYY-MM-dd`
-const DATE_D_M_Y: Lazy<ReadableRe> = Lazy::new(|| {
+pub const DATE_D_M_Y: Lazy<ReadableRe> = Lazy::new(|| {
     group(
         group(DAY.clone())
             + chars(r"-/.\\")
@@ -51,14 +51,14 @@ const DATE_D_M_Y: Lazy<ReadableRe> = Lazy::new(|| {
 });
 
 /// Minutes or seconds representation `00`-`59`
-const MIN_SEC: Lazy<ReadableRe> = Lazy::new(|| chars("0-5") + chars("0-9"));
+pub const MIN_SEC: Lazy<ReadableRe> = Lazy::new(|| chars("0-5") + chars("0-9"));
 
 /// Hours 12h format
-const HOURS_12: Lazy<ReadableRe> =
+pub const HOURS_12: Lazy<ReadableRe> =
     Lazy::new(|| either([Raw("0") + chars("0-9"), Raw("1") + chars("0-2")]));
 
 /// Hours 24h format
-const HOURS_24: Lazy<ReadableRe> = Lazy::new(|| {
+pub const HOURS_24: Lazy<ReadableRe> = Lazy::new(|| {
     either([
         Raw("0") + chars("0-9"),
         Raw("1") + chars("0-9"),
@@ -69,7 +69,7 @@ const HOURS_24: Lazy<ReadableRe> = Lazy::new(|| {
 const MERIDIEMS: Lazy<ReadableRe> =
     Lazy::new(|| either([chars("ap") + "m".into(), chars("AP") + chars("Mm")]));
 
-const HH_MM_12: Lazy<ReadableRe> = Lazy::new(|| {
+pub const HH_MM_12: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(
         group(HOURS_12.clone())
             + ":".into()
@@ -79,11 +79,11 @@ const HH_MM_12: Lazy<ReadableRe> = Lazy::new(|| {
     )
 });
 
-const HH_MM_24: Lazy<ReadableRe> = Lazy::new(|| {
+pub const HH_MM_24: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(group(HOURS_24.clone()) + ":".into() + group(MIN_SEC.clone()))
 });
 
-const HH_MM_SS_24: Lazy<ReadableRe> = Lazy::new(|| {
+pub const HH_MM_SS_24: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(
         group(HOURS_24.clone())
             + ":".into()
@@ -99,7 +99,6 @@ mod tests {
         DATE_D_M_Y, DATE_Y_M_D, DAY, HH_MM_12, HH_MM_24, HH_MM_SS_24, HOURS_12, HOURS_24,
         MERIDIEMS, MIN_SEC, MONTH, YEAR,
     };
-    use std::fmt::format;
 
     #[test]
     fn day() {

@@ -2,31 +2,32 @@ use crate::ReadableRe::*;
 use crate::*;
 use once_cell::sync::Lazy;
 
-const POSITIVE_INTEGER: Lazy<ReadableRe> = Lazy::new(|| starts_and_ends_with(one_or_more(Digit)));
+pub const POSITIVE_INTEGER: Lazy<ReadableRe> =
+    Lazy::new(|| starts_and_ends_with(one_or_more(Digit)));
 
-const NEGATIVE_INTEGER: Lazy<ReadableRe> =
+pub const NEGATIVE_INTEGER: Lazy<ReadableRe> =
     Lazy::new(|| starts_and_ends_with(MinusSign + one_or_more(Digit)));
 
-const INTEGER: Lazy<ReadableRe> =
+pub const INTEGER: Lazy<ReadableRe> =
     Lazy::new(|| starts_and_ends_with(optional(MinusSign) + one_or_more(Digit)));
 
-const POSITIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
+pub const POSITIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(group(zero_or_more(Digit)) + chars(".,") + group(one_or_more(Digit)))
 });
 
-const NEGATIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
+pub const NEGATIVE_DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(
         MinusSign + group(zero_or_more(Digit)) + chars(".,") + group(one_or_more(Digit)),
     )
 });
 
-const DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
+pub const DECIMAL: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(
         optional(MinusSign) + group(zero_or_more(Digit)) + chars(".,") + group(one_or_more(Digit)),
     )
 });
 
-const FRACTION: Lazy<ReadableRe> = Lazy::new(|| {
+pub const FRACTION: Lazy<ReadableRe> = Lazy::new(|| {
     starts_and_ends_with(group(
         one_or_more(Digit) + chars("/\\\\") + group(one_or_more(Digit)),
     ))
