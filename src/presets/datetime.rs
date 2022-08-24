@@ -1,5 +1,5 @@
 use crate::ReadableRe::*;
-use crate::{chars, either, exactly, group, ReadableRe};
+use crate::{chars, either, exactly, group, optional, starts_and_ends_with, ReadableRe};
 use once_cell::sync::Lazy;
 
 /// Month day, `01`-`31`
@@ -32,9 +32,9 @@ const YEAR: Lazy<ReadableRe> = Lazy::new(|| chars("12") + exactly(3, Digit));
 const DATE_Y_M_D: Lazy<ReadableRe> = Lazy::new(|| {
     group(
         group(YEAR.clone())
-            + chars("-/.\\\\")
+            + chars(r"-/.\\")
             + group(MONTH.clone())
-            + chars("-/.\\\\")
+            + chars(r"-/.\\")
             + group(DAY.clone()),
     )
 });
@@ -43,9 +43,9 @@ const DATE_Y_M_D: Lazy<ReadableRe> = Lazy::new(|| {
 const DATE_D_M_Y: Lazy<ReadableRe> = Lazy::new(|| {
     group(
         group(DAY.clone())
-            + chars("-/.\\\\")
+            + chars(r"-/.\\")
             + group(MONTH.clone())
-            + chars("-/.\\\\")
+            + chars(r"-/.\\")
             + group(YEAR.clone()),
     )
 });
@@ -69,10 +69,35 @@ const HOURS_24: Lazy<ReadableRe> = Lazy::new(|| {
 const MERIDIEMS: Lazy<ReadableRe> =
     Lazy::new(|| either([chars("ap") + "m".into(), chars("AP") + chars("Mm")]));
 
+const HH_MM_12: Lazy<ReadableRe> = Lazy::new(|| {
+    starts_and_ends_with(
+        group(HOURS_12.clone())
+            + ":".into()
+            + group(MIN_SEC.clone())
+            + optional(" ".into())
+            + group(MERIDIEMS.clone()),
+    )
+});
+
+const HH_MM_24: Lazy<ReadableRe> = Lazy::new(|| {
+    starts_and_ends_with(group(HOURS_24.clone()) + ":".into() + group(MIN_SEC.clone()))
+});
+
+const HH_MM_SS_24: Lazy<ReadableRe> = Lazy::new(|| {
+    starts_and_ends_with(
+        group(HOURS_24.clone())
+            + ":".into()
+            + group(MIN_SEC.clone())
+            + ":".into()
+            + group(MIN_SEC.clone()),
+    )
+});
+
 #[cfg(test)]
 mod tests {
-    use crate::common::datetime::{
-        DATE_D_M_Y, DATE_Y_M_D, DAY, HOURS_12, HOURS_24, MERIDIEMS, MIN_SEC, MONTH, YEAR,
+    use crate::presets::datetime::{
+        DATE_D_M_Y, DATE_Y_M_D, DAY, HH_MM_12, HH_MM_24, HH_MM_SS_24, HOURS_12, HOURS_24,
+        MERIDIEMS, MIN_SEC, MONTH, YEAR,
     };
     use std::fmt::format;
 
@@ -170,5 +195,29 @@ mod tests {
         assert!(query.is_match("PM"));
         assert!(!query.is_match("aM"));
         assert!(!query.is_match("pM"));
+    }
+
+    #[test]
+    fn hh_mm_12() {
+        let query = HH_MM_12.compile().unwrap();
+        assert!(query.is_match("11:30 pm"));
+        assert!(query.is_match("11:30 am"));
+        assert!(!query.is_match("18:30 pm"));
+    }
+
+    #[test]
+    fn hh_mm_24() {
+        let query = HH_MM_24.compile().unwrap();
+        assert!(query.is_match("11:30"));
+        assert!(query.is_match("23:30"));
+        assert!(!query.is_match("11:30 pm"));
+    }
+
+    #[test]
+    fn hh_mm_ss_24() {
+        let query = HH_MM_SS_24.compile().unwrap();
+        assert!(query.is_match("11:30:59"));
+        assert!(query.is_match("23:30:59"));
+        assert!(!query.is_match("18:30:89"));
     }
 }

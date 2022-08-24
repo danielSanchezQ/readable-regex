@@ -13,8 +13,8 @@
 //! * `re` => Use [`regex`] crate backend.
 //! * `re-fancy` => Use [`fancy_regex`] crate backend and expands this crate functionality.
 
-#[cfg(feature = "common")]
-pub mod common;
+#[cfg(feature = "presets")]
+pub mod presets;
 mod constants;
 pub mod readable;
 pub mod solvers;

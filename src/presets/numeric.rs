@@ -34,7 +34,7 @@ const FRACTION: Lazy<ReadableRe> = Lazy::new(|| {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::numeric::{
+    use crate::presets::numeric::{
         DECIMAL, FRACTION, INTEGER, NEGATIVE_DECIMAL, NEGATIVE_INTEGER, POSITIVE_DECIMAL,
         POSITIVE_INTEGER,
     };

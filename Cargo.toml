@@ -15,4 +15,4 @@ once_cell = {version = "1.13", optional = true }
 default = ["re"]
 re = ["regex"]
 re-fancy = ["fancy-regex"]
-common = ["once_cell"]
+presets = ["once_cell"]
