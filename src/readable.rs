@@ -12,6 +12,7 @@ use regex::Regex;
 use fancy_regex::Regex;
 
 /// Enum wrapper around regex expressions, it is a recursive version of regexes
+#[derive(Clone)]
 pub enum ReadableRe<'a> {
     /// digit match, `"\d"`
     Digit,

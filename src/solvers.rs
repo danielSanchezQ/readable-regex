@@ -23,6 +23,7 @@ macro_rules! impl_builder_from_iter {
 /// use readable_regex::ReadableRe::Raw;
 /// assert_eq!(&Concat::from_iter([Raw("foo"), Raw("bar")]).to_string(), "foobar");
 /// ```
+#[derive(Clone)]
 pub struct Concat<'a>(pub(crate) Vec<ReadableRe<'a>>);
 
 impl<'a> Concat<'a> {
@@ -54,6 +55,7 @@ impl<'a> Display for Concat<'a> {
 /// let back_3 = BackReference(3);
 /// assert_eq!(back_3.to_string(), "\\3");
 /// ```
+#[derive(Clone)]
 pub struct BackReference(pub usize);
 
 #[cfg(feature = "re-fancy")]
@@ -71,6 +73,7 @@ impl Display for BackReference {
 /// let scaped = Escape::new_str("!#$%&");
 /// assert_eq!(scaped.to_string(), "!\\#\\$%\\&");
 /// ```
+#[derive(Clone)]
 pub struct Escape<'a>(Box<ReadableRe<'a>>);
 
 impl Display for Escape<'_> {
@@ -107,6 +110,7 @@ impl_builder_from_iter!(Escape);
 ///     "(cat(dog)(moose))",
 /// );
 /// ```
+#[derive(Clone)]
 pub struct Group<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> Group<'a> {
@@ -148,6 +152,7 @@ impl_builder_from_iter!(Group);
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kitty").unwrap());
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// ```
+#[derive(Clone)]
 pub struct PositiveLookAhead<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
@@ -192,6 +197,7 @@ impl_builder_from_iter!(PositiveLookAhead);
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kitty").unwrap());
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// ```
+#[derive(Clone)]
 pub struct NegativeLookAhead<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
@@ -234,6 +240,7 @@ impl_builder_from_iter!(NegativeLookAhead);
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("cat").unwrap());
 /// ```
+#[derive(Clone)]
 pub struct PositiveLookBehind<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
@@ -277,6 +284,7 @@ impl_builder_from_iter!(PositiveLookBehind);
 /// assert!(!fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("kittycat").unwrap());
 /// assert!(fancy_regex::Regex::new(&query.to_string()).unwrap().is_match("black cat").unwrap());
 /// ```
+#[derive(Clone)]
 pub struct NegativeLookBehind<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]
@@ -314,6 +322,7 @@ impl_builder_from_iter!(NegativeLookBehind);
 ///     "(?P<pobox>PO BOX \\d{3:5})"
 /// );
 /// ```
+#[derive(Clone)]
 pub struct NamedGroup<'a> {
     name: &'a str,
     regexes: Box<ReadableRe<'a>>,
@@ -354,6 +363,7 @@ impl<'a> Display for NamedGroup<'a> {
 ///     "(?:pattern_to_look_for)"
 /// );
 /// ```
+#[derive(Clone)]
 pub struct NonCaptureGroup<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> NonCaptureGroup<'a> {
@@ -382,6 +392,7 @@ impl_builder_from_iter!(NonCaptureGroup);
 ///     "foo?"
 /// );
 /// ```
+#[derive(Clone)]
 pub struct Optional<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> Optional<'a> {
@@ -408,6 +419,7 @@ impl_builder_from_iter!(Optional);
 /// use readable_regex::ReadableRe::Raw;
 /// assert_eq!(Either::new([Raw("a"), Raw("b"), Raw("c")]).to_string(), "a|b|c")
 /// ```
+#[derive(Clone)]
 pub struct Either<'a>(Concat<'a>);
 
 impl<'a> Either<'a> {
@@ -444,6 +456,7 @@ impl<'a> FromIterator<ReadableRe<'a>> for Either<'a> {
 /// let query = Exactly::new(3, Raw("A"));
 /// assert_eq!(query.to_string(), "A{3}")
 /// ```
+#[derive(Clone)]
 pub struct Exactly<'a> {
     quantity: usize,
     re: Box<ReadableRe<'a>>,
@@ -483,33 +496,16 @@ impl<'a> Display for Exactly<'a> {
 /// assert_eq!(query.to_string(), "abc{,}");
 /// ```
 pub struct Ranged<'a> {
-    range: Box<dyn BasicRangedExt>,
+    range: (Bound<usize>, Bound<usize>),
     re: Box<ReadableRe<'a>>,
 }
 
-trait BasicRangedExt {
-    fn min(&self) -> Bound<&usize>;
-
-    fn max(&self) -> Bound<&usize>;
-
-    fn contains(&self, n: &usize) -> bool;
-}
-
-/// Helper trait to make RangedBounds object safe by constraining to usize
-impl<T> BasicRangedExt for T
-where
-    T: RangeBounds<usize>,
-{
-    fn min(&self) -> Bound<&usize> {
-        self.start_bound()
-    }
-
-    fn max(&self) -> Bound<&usize> {
-        self.end_bound()
-    }
-
-    fn contains(&self, n: &usize) -> bool {
-        RangeBounds::contains(self, n)
+impl<'a> Clone for Ranged<'a> {
+    fn clone(&self) -> Self {
+        Self {
+            range: self.range,
+            re: self.re.clone(),
+        }
     }
 }
 
@@ -519,7 +515,7 @@ impl<'a> Ranged<'a> {
         R: RangeBounds<usize> + 'static,
     {
         Self {
-            range: Box::new(range),
+            range: (range.start_bound().cloned(), range.end_bound().cloned()),
             re: Box::new(re),
         }
     }
@@ -527,7 +523,7 @@ impl<'a> Ranged<'a> {
 
 impl<'a> Display for Ranged<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let (min, max) = match (self.range.min(), self.range.max()) {
+        let (min, max) = match self.range {
             (
                 Bound::Included(min) | Bound::Excluded(min),
                 Bound::Included(max) | Bound::Excluded(max),
@@ -555,6 +551,7 @@ impl<'a> Display for Ranged<'a> {
 /// let query = ZeroOrMore::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc*")
 /// ```
+#[derive(Clone)]
 pub struct ZeroOrMore<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> ZeroOrMore<'a> {
@@ -582,6 +579,7 @@ impl_builder_from_iter!(ZeroOrMore);
 /// let query = ZeroOrMoreLazy::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc*?")
 /// ```
+#[derive(Clone)]
 pub struct ZeroOrMoreLazy<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> ZeroOrMoreLazy<'a> {
@@ -609,6 +607,7 @@ impl_builder_from_iter!(ZeroOrMoreLazy);
 /// let query = OneOrMore::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc+")
 /// ```
+#[derive(Clone)]
 pub struct OneOrMore<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> OneOrMore<'a> {
@@ -636,6 +635,7 @@ impl_builder_from_iter!(OneOrMore);
 /// let query = OneOrMoreLazy::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc+?")
 /// ```
+#[derive(Clone)]
 pub struct OneOrMoreLazy<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> OneOrMoreLazy<'a> {
@@ -662,6 +662,7 @@ impl_builder_from_iter!(OneOrMoreLazy);
 /// let query = StartsWith::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "^abc");
 /// ```
+#[derive(Clone)]
 pub struct StartsWith<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> StartsWith<'a> {
@@ -688,6 +689,7 @@ impl_builder_from_iter!(StartsWith);
 /// let query = EndsWith::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "abc$");
 /// ```
+#[derive(Clone)]
 pub struct EndsWith<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> EndsWith<'a> {
@@ -715,6 +717,7 @@ impl_builder_from_iter!(EndsWith);
 /// let query =  StartsAndEndsWith::new(Raw("abc"));
 /// assert_eq!(query.to_string(), "^abc$");
 /// ```
+#[derive(Clone)]
 pub struct StartsAndEndsWith<'a>(Box<ReadableRe<'a>>);
 
 impl<'a> StartsAndEndsWith<'a> {
@@ -739,14 +742,15 @@ impl_builder_from_iter!(StartsAndEndsWith);
 ///
 /// ```
 /// use readable_regex::solvers::Chars;
-/// let query = Chars::new("abc".chars());
+/// let query = Chars::new("abc");
 /// assert_eq!(query.to_string(), "[abc]");
 /// ```
+#[derive(Clone)]
 pub struct Chars(String);
 
 impl Chars {
-    pub fn new(iter: impl IntoIterator<Item = char>) -> Self {
-        Self::from_iter(iter)
+    pub fn new(s: &str) -> Self {
+        Self(s.to_string())
     }
 }
 
@@ -756,38 +760,27 @@ impl Display for Chars {
     }
 }
 
-impl FromIterator<char> for Chars {
-    fn from_iter<T: IntoIterator<Item = char>>(iter: T) -> Self {
-        Self(iter.into_iter().collect())
-    }
-}
-
 /// Regex syntax for a character class excluding the characters in the input [`IntoIterator`]
 ///
 /// ## Example
 ///
 /// ```
 /// use readable_regex::solvers::NotChars;
-/// let query = NotChars::new("abc".chars());
+/// let query = NotChars::new("abc");
 /// assert_eq!(query.to_string(), "[^abc]");
 /// ```
+#[derive(Clone)]
 pub struct NotChars(String);
 
 impl NotChars {
-    pub fn new(iter: impl IntoIterator<Item = char>) -> Self {
-        Self::from_iter(iter)
+    pub fn new(s: &str) -> Self {
+        Self(s.to_string())
     }
 }
 
 impl Display for NotChars {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "[^{}]", self.0)
-    }
-}
-
-impl FromIterator<char> for NotChars {
-    fn from_iter<T: IntoIterator<Item = char>>(iter: T) -> Self {
-        Self(iter.into_iter().collect())
     }
 }
 
@@ -802,6 +795,7 @@ impl FromIterator<char> for NotChars {
 /// let query = AtomicGroup::new(Raw("foo"));
 /// assert_eq!(query.to_string(), "(?>foo)")
 /// ```
+#[derive(Clone)]
 pub struct AtomicGroup<'a>(Box<ReadableRe<'a>>);
 
 #[cfg(feature = "re-fancy")]

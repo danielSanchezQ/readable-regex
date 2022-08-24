@@ -1,17 +1,29 @@
 [package]
 name = "readable-regex"
-version = "0.1.0"
+authors = [
+    "danielsanchezq <sanchez.quiros.daniel@gmail.com>"
+]
+version = "0.1.0-alpha1"
 edition = "2021"
 license-file = "./LICENSE"
+readme = "./README.md"
+homepage = "https://github.com/danielSanchezQ/readable-regex"
+repository = "https://github.com/danielSanchezQ/readable-regex"
+description = "Regex made for humans. Wrapper to build regexes in a verbose style."
+keywords = ["regex"]
+categories = ["text-processing"]
+exclude = ["/.github/*", ".idea/*"]
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 regex = { version = "1.6.0", optional = true }
-fancy-regex = { version = "0.10", optional = true}
-
+fancy-regex = { version = "0.10", optional = true }
+once_cell = {version = "1.13", optional = true }
 
 [features]
 default = ["re"]
 re = ["regex"]
 re-fancy = ["fancy-regex"]
+presets = ["once_cell"]
