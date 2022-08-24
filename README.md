@@ -15,6 +15,8 @@ be more understandable in a verbose mode.
 `readable-regex` crate is a set of tools to build those regexes in a verbose way. Which aims
 to improve readability of code.
 
+It builds on top on the already excellent [`regex`](https://crates.io/crates/regex) and [`fancy-regex`](https://crates.io/crates/fancy-regex) crates.
+
 
 ## Add dependency
 Add the dependency to your `Cargo.toml` file: 
