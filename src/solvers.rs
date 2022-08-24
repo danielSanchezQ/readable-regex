@@ -766,27 +766,21 @@ impl Display for Chars {
 ///
 /// ```
 /// use readable_regex::solvers::NotChars;
-/// let query = NotChars::new("abc".chars());
+/// let query = NotChars::new("abc");
 /// assert_eq!(query.to_string(), "[^abc]");
 /// ```
 #[derive(Clone)]
 pub struct NotChars(String);
 
 impl NotChars {
-    pub fn new(iter: impl IntoIterator<Item = char>) -> Self {
-        Self::from_iter(iter)
+    pub fn new(s: &str) -> Self {
+        Self(s.to_string())
     }
 }
 
 impl Display for NotChars {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "[^{}]", self.0)
-    }
-}
-
-impl FromIterator<char> for NotChars {
-    fn from_iter<T: IntoIterator<Item = char>>(iter: T) -> Self {
-        Self(iter.into_iter().collect())
     }
 }
 

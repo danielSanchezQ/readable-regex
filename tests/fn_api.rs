@@ -268,8 +268,8 @@ fn test_chars() {
 
 #[test]
 fn test_not_chars() {
-    assert_eq!(not_chars("A-Z".chars()).to_string(), "[^A-Z]");
-    assert_eq!(not_chars(['c', 'a', 't']).to_string(), "[^cat]");
+    assert_eq!(not_chars("A-Z").to_string(), "[^A-Z]");
+    assert_eq!(not_chars("cat").to_string(), "[^cat]");
 }
 
 #[test]

@@ -416,8 +416,8 @@ pub fn chars(re: &str) -> ReadableRe {
     ReadableRe::Chars(solvers::Chars::new(re))
 }
 
-pub fn not_chars<'a>(iter: impl IntoIterator<Item = char>) -> ReadableRe<'a> {
-    ReadableRe::NotChars(solvers::NotChars::new(iter))
+pub fn not_chars<'a>(s: &str) -> ReadableRe<'a> {
+    ReadableRe::NotChars(solvers::NotChars::new(s))
 }
 
 #[cfg(feature = "re-fancy")]
