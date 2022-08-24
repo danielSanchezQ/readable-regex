@@ -1,8 +1,19 @@
 [package]
 name = "readable-regex"
-version = "0.1.0"
+authors = [
+    "danielsanchezq <sanchez.quiros.daniel@gmail.com>"
+]
+version = "0.1.0-beta1"
 edition = "2021"
 license-file = "./LICENSE"
+readme = "./README.md"
+homepage = "https://github.com/danielSanchezQ/readable-regex"
+repository = "https://github.com/danielSanchezQ/readable-regex"
+description = "Regex made for humans. Wrapper to build regexes in a verbose style."
+keywords = ["regex"]
+categories = ["text-processing"]
+exclude = ["/.github/*"]
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
