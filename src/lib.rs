@@ -6,8 +6,45 @@
 //! `readable-regex` crate is a set of tools to build those regexes in a verbose way. Which aims
 //! to improve readability of code.
 //!
-//! ### Examples
+//! ### Available APIs
 //!
+//!
+//! ### Examples
+//! How to build a simple date match (as implemented in the `datetime` module under `presets` feature):
+//! ```
+//! use once_cell::sync::Lazy;
+//! use readable_regex::*;
+//! use readable_regex::ReadableRe::*;
+//!
+//! /// Month day, `01`-`31`
+//! pub const DAY: Lazy<ReadableRe> = Lazy::new(|| {
+//!     either([
+//!         Raw("0") + chars("1-9"),
+//!         chars("12") + Digit,
+//!         Raw("3") + chars("01"),
+//!     ])
+//! });
+//!
+//! /// Month numeral, `01`-`12`
+//! pub const MONTH: Lazy<ReadableRe> =
+//!     Lazy::new(|| either([Raw("0") + chars("1-9"), Raw("1") + chars("0-2")]));
+//!
+//! /// Years from `1000` to `2999`
+//! pub const YEAR: Lazy<ReadableRe> = Lazy::new(|| chars("12") + exactly(3, Digit));
+//!
+//! /// Date Format `YYYY-MM-dd`
+//! pub const DATE_Y_M_D: Lazy<ReadableRe> = Lazy::new(|| {
+//!     group(
+//!         group(YEAR.clone())
+//!             + chars(r"-/.\\")
+//!             + group(MONTH.clone())
+//!             + chars(r"-/.\\")
+//!             + group(DAY.clone()),
+//!     )
+//! });
+//!
+//! assert!(DATE_Y_M_D.compile().unwrap().is_match("2022/04/18"));
+//! ```
 //!
 //! ### Features
 //! * `re` => Use [`regex`] crate backend.
