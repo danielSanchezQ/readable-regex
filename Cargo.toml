@@ -12,7 +12,7 @@ repository = "https://github.com/danielSanchezQ/readable-regex"
 description = "Regex made for humans. Wrapper to build regexes in a verbose style."
 keywords = ["regex"]
 categories = ["text-processing"]
-exclude = ["/.github/*"]
+exclude = ["/.github/*", ".idea/*"]
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
