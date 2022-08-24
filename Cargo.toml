@@ -3,7 +3,7 @@ name = "readable-regex"
 authors = [
     "danielsanchezq <sanchez.quiros.daniel@gmail.com>"
 ]
-version = "0.1.0-beta1"
+version = "0.1.0-alpha1"
 edition = "2021"
 license-file = "./LICENSE"
 readme = "./README.md"
