@@ -6,7 +6,7 @@ use once_cell::sync::Lazy;
 pub const DAY: Lazy<ReadableRe> = Lazy::new(|| {
     either([
         Raw("0") + chars("1-9"),
-        chars("12") + Digit,
+        chars("12") + chars("0-9"),
         Raw("3") + chars("01"),
     ])
 });

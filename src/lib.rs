@@ -8,6 +8,30 @@
 //!
 //! ### Available APIs
 //!
+//! The main wrapper is the [`ReadableRe`] enum.
+//!
+//! There are tow main options to build regexes with it, either using the **enum** itself:
+//!
+//! ```
+//! use readable_regex::ReadableRe;
+//! let query = ReadableRe::Raw("<some regex expression>");
+//! ```
+//!
+//! or by using the functions wrappers around it:
+//!
+//! ```
+//! use readable_regex::raw_regex;
+//! let query = raw_regex("<some regex expression>");
+//! ```
+//!
+//! Also, any combination of them:
+//!
+//! ```
+//! use readable_regex::{digit, group};
+//! use readable_regex::ReadableRe::*;
+//! let query = group(digit() + Digit + digit());
+//! println!("{}", query.to_string());
+//! ```
 //!
 //! ### Examples
 //! How to build a simple date match (as implemented in the `datetime` module under `presets` feature):
@@ -20,7 +44,7 @@
 //! pub const DAY: Lazy<ReadableRe> = Lazy::new(|| {
 //!     either([
 //!         Raw("0") + chars("1-9"),
-//!         chars("12") + Digit,
+//!         chars("12") + chars("1-9"),
 //!         Raw("3") + chars("01"),
 //!     ])
 //! });
