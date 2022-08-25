@@ -56,7 +56,7 @@ println!("{}", query.to_string());
 
 ### Example
 How to build a simple date match (as implemented in the `datetime` module under `presets` feature):
-```
+```rust
 use once_cell::sync::Lazy;
 use readable_regex::*;
 use readable_regex::ReadableRe::*;
